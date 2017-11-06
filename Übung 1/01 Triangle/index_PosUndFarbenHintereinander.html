@@ -1,0 +1,49 @@
+﻿<!-- 
+
+Purpose of the HTML file: put in all stuff related to the structure of the website
+Put the action in the JavaScript file
+
+Assign IDs to the shaders as well as the canvas to reference them directly in your JavaScript application
+
+-->
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>WebGL Example</title>
+		
+		<script id="vertex-shader" type="x-shader/x-vertex">
+			attribute vec4 vPosition;
+			attribute vec4 vColor;
+
+			varying vec4 fColor;
+			void main()
+			{
+				fColor = vColor;
+				gl_Position = vPosition;
+                gl_PointSize = 10.0;
+			}
+		</script>
+		<script id="fragment-shader" type="x-shader/x-fragment">
+			#ifdef GL_ES
+			precision mediump float;
+			#endif
+			
+			varying vec4 fColor;
+			void main()
+			{
+				gl_FragColor = fColor;
+			}
+		</script>
+		<script type="text/javascript" src="common/initShaders.js"></script>
+	</head>
+	<body>
+		<h1>Lorem Ipsum</h1>
+
+		<canvas id="gl-canvas" width="512" height="512">
+			If you see this, your browser doesn't support WebGL.
+		</canvas>
+		
+		<script src="triangle_PosUndFarbenHintereinander.js" type="text/javascript"></script>	
+	</body>
+</html>
