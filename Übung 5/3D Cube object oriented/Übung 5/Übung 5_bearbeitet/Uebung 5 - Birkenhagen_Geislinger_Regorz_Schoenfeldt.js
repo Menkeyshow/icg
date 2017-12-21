@@ -22,10 +22,7 @@ let objects = [];
 let program;
 
 let pointLoc,
-	normalLoc;
-
-let normalMatrix;
-
+	colorLoc;
 
 let modelMatrixLoc;
 
@@ -48,17 +45,18 @@ function degToRad (deg) {
 }
 
 class Pyramidenstumpf {
-		constructor (from = {x: -0.5, y: -0.0, z: -0.5}, to = {x: 0.5, y: 0.5, z: 0.5}) {
+		constructor (from = {x: -0.5, y: -0.0, z: -0.5}, to = {x: 0.5, y: 0.5, z: 0.5}, 
+			sideColors = {front: [0.545, 0.271, 0.075, 1], right: [0.545, 0.271, 0.075, 1], back: [0.545, 0.271, 0.075, 1], left: [0.545, 0.271, 0.075, 1],
+				 bottom: [0.545, 0.271, 0.075, 1], top: [0.545, 0.271, 0.075, 1]}) {
 			this.from = from;
 			this.to = to;
+			this.sideColors = sideColors;
 			this.mesh = [];
-			this.normals = [];
+			this.colors = [];
 			this.orientation = {x: 0, y: 0, z: 0};
-			this.position = {x: 0.0, y: 0.0, z: 0.0};
+			this.position = {x: 0.0, y: -0.99, z: 0.0};
 			this.verticesVBO = gl.createBuffer();
-			this.modelMatrix;
-			this.normalMatrix;
-			this.SetModelMatrix(this.position, this.orientation);
+			this.modelMatrix = this.SetModelMatrix(this.position, this.orientation);
 	
 			this.MakeModel();
 			this.InitBuffer();
@@ -124,9 +122,9 @@ class Pyramidenstumpf {
 				this.to.x, this.to.y, this.to.z
 			]
 	
-			//for (let i = 0; Math.floor(i/6) < 6; i++) {
-			//
-			//	this.colors = this.colors.concat(Object.values(this.sideColors)[Math.floor(i/6)]);
+			for (let i = 0; Math.floor(i/6) < 6; i++) {
+	
+				this.colors = this.colors.concat(Object.values(this.sideColors)[Math.floor(i/6)]);
 	
 			}
 		}
@@ -137,16 +135,17 @@ class Pyramidenstumpf {
 		 * @param {Object} orientation x,y,z - angles in degree
 		 */
 		SetModelMatrix (position, orientation) {
-		
+			
 			// Convert the orientation to RAD
 			orientation = {x: degToRad(orientation.x), y: degToRad(orientation.y), z: degToRad(orientation.z)};
 		
 			// Set the transformation matrix
-			this.modelMatrix = mat4.create();
-			mat4.translate(this.modelMatrix, this.modelMatrix, [position.x, position.y, position.z]);
-			mat4.rotate(this.modelMatrix, this.modelMatrix, orientation.x, [1, 0, 0]);
-			mat4.rotate(this.modelMatrix, this.modelMatrix, orientation.y, [0, 1, 0]);
-			mat4.rotate(this.modelMatrix, this.modelMatrix, orientation.z, [0, 0, 1]);
+			return [
+				1, 0, 0, 0,
+				0, 1, 0, 0,
+				0, 0, 1, 0,
+				position.x, position.y, position.z, 1
+			];
 		}
 	
 		/**
@@ -155,8 +154,8 @@ class Pyramidenstumpf {
 		InitBuffer () {
 			gl.useProgram(program);
 			gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesVBO);
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.mesh.concat(this.normals)), gl.STATIC_DRAW);
-			
+	
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.mesh.concat(this.colors)), gl.STATIC_DRAW);
 		}
 	
 		/**
@@ -174,9 +173,9 @@ class Pyramidenstumpf {
 	
 			// Set attribute pointers and enable them
 			gl.vertexAttribPointer(pointLoc, 3, gl.FLOAT, false, 0, 0);
-			gl.vertexAttribPointer(normalLoc, 4, gl.FLOAT, false, 0, this.mesh.length*3);
+			gl.vertexAttribPointer(colorLoc, 4, gl.FLOAT, false, 0, this.mesh.length*4);
 			gl.enableVertexAttribArray(pointLoc);
-			gl.enableVertexAttribArray(normalLoc);
+			gl.enableVertexAttribArray(colorLoc);
 	
 			// Set uniforms
 			this.UpdateBuffer();
@@ -188,9 +187,9 @@ class Pyramidenstumpf {
 
 
 class Cube {
-	constructor (from = {x: 0.0, y: 0.0, z: 0.0}, to = {x: 0.0, y: 0.0, z: 0.0}, 
-		sideColors = {front: [1, 1, 0, 1], right: [1, 1, 0, 1], back: [1, 1, 0, 1], left: [1, 1, 0, 1],
-			 bottom: [1, 1, 0, 1], top: [1, 1, 0, 1]}) {
+	constructor (from = {x: -0.5, y: -0.5, z: -0.5}, to = {x: 0.5, y: 0.5, z: 0.5}, 
+		sideColors = {front: [0, 0, 1, 1], right: [0, 1, 0, 1], back: [1, 0, 0, 1], left: [1, 1, 0, 1],
+			 bottom: [1, 0, 1, 1], top: [0, 1, 1, 1]}) {
 		this.from = from;
 		this.to = to;
 		this.sideColors = sideColors;
@@ -199,8 +198,7 @@ class Cube {
 		this.orientation = {x: 0, y: 0, z: 0};
 		this.position = {x: 0, y: 0, z: 0};
 		this.verticesVBO = gl.createBuffer();
-		this.modelMatrix;
-		this.SetModelMatrix(this.position, this.orientation);
+		this.modelMatrix = this.SetModelMatrix(this.position, this.orientation);
 
 		this.MakeModel();
 		this.InitBuffer();
@@ -342,6 +340,54 @@ function init() {
 	gl.clearColor(0.95,0.95,0.95,1.0);
 	gl.enable(gl.DEPTH_TEST);
 
+	// 3. Specify vertices
+
+	//Himmel
+	objects.push(new Cube(from = {x: -1.0, y: -1.0, z: -1.0}, to = {x: 1.0, y: 1.0, z: 1.0}, sideColors = {front: [0.529, 0.808, 0.980, 1], right: [0.529, 0.808, 0.980, 1], back: [0.529, 0.808, 0.980, 1], left: [0.529, 0.808, 0.980, 1], bottom: [0.529, 0.808, 0.980, 1], top: [0.529, 0.808, 0.980, 1]}));
+	
+	//Ozean
+	objects.push(new Cube(from = {x: -1.0, y: -0.99, z: -1.0}, to = {x: 1, y: -0.99, z: 1.0}, sideColors = {front: [0, 0, 1, 1], right: [1, 1, 0, 1], back: [1, 1, 0, 1], left: [1, 1, 0, 1], bottom: [0, 0, 1, 1], top: [0, 0, 1, 1]}));	
+	
+	//Strand
+	objects.push(new Cube(from = {x: -0.5, y: -0.99, z: -0.5}, to = {x: 0.5, y: -0.98, z: 0.5}, sideColors = {front: [1, 1, 0, 1], right: [1, 1, 0, 1], back: [1, 1, 0, 1], left: [1, 1, 0, 1], bottom: [1, 1, 0, 1], top: [1, 1, 0, 1]}));	
+	
+	//Palmenstamm
+
+	let digga = new Pyramidenstumpf(from = {x: -0.04, y: 0.0, z: -0.04}, to = {x: 0.04, y: 0.04, z: 0.04}, 
+		sideColors = {front: [0.545, 0.271, 0.075, 1], right: [0.545, 0.271, 0.075, 1], back: [0.545, 0.271, 0.075, 1], left: [0.545, 0.271, 0.075, 1],
+			bottom: [0.545, 0.271, 0.075, 1], top: [0.545, 0.271, 0.075, 1]});
+
+			//digga.SetModelMatrix({x: 0, y: 0, z: 0}, {x: 45, y: 45, z: 45});
+
+			objects.push(digga);
+	
+	objects.push(new Pyramidenstumpf(from = {x: -0.04, y: 0.04, z: -0.04}, to = {x: 0.04, y: 0.08, z: 0.04}, 
+		sideColors = {front: [0.545, 0.271, 0.075, 1], right: [0.545, 0.271, 0.075, 1], back: [0.545, 0.271, 0.075, 1], left: [0.545, 0.271, 0.075, 1],
+			bottom: [0.545, 0.271, 0.075, 1], top: [0.545, 0.271, 0.075, 1]}));
+
+	objects.push(new Pyramidenstumpf(from = {x: -0.04, y: 0.08, z: -0.04}, to = {x: 0.04, y: 0.12, z: 0.04}, 
+		sideColors = {front: [0.545, 0.271, 0.075, 1], right: [0.545, 0.271, 0.075, 1], back: [0.545, 0.271, 0.075, 1], left: [0.545, 0.271, 0.075, 1],
+			bottom: [0.545, 0.271, 0.075, 1], top: [0.545, 0.271, 0.075, 1]}));
+
+	objects.push(new Pyramidenstumpf(from = {x: -0.04, y: 0.12, z: -0.04}, to = {x: 0.04, y: 0.16, z: 0.04}, 
+		sideColors = {front: [0.545, 0.271, 0.075, 1], right: [0.545, 0.271, 0.075, 1], back: [0.545, 0.271, 0.075, 1], left: [0.545, 0.271, 0.075, 1],
+			bottom: [0.545, 0.271, 0.075, 1], top: [0.545, 0.271, 0.075, 1]}));
+
+	objects.push(new Pyramidenstumpf(from = {x: -0.04, y: 0.16, z: -0.04}, to = {x: 0.04, y: 0.20, z: 0.04}, 
+		sideColors = {front: [0.545, 0.271, 0.075, 1], right: [0.545, 0.271, 0.075, 1], back: [0.545, 0.271, 0.075, 1], left: [0.545, 0.271, 0.075, 1],
+			bottom: [0.545, 0.271, 0.075, 1], top: [0.545, 0.271, 0.075, 1]}));
+
+	objects.push(new Pyramidenstumpf(from = {x: -0.04, y: 0.2, z: -0.04}, to = {x: 0.04, y: 0.24, z: 0.04}, 
+		sideColors = {front: [0.545, 0.271, 0.075, 1], right: [0.545, 0.271, 0.075, 1], back: [0.545, 0.271, 0.075, 1], left: [0.545, 0.271, 0.075, 1],
+			bottom: [0.545, 0.271, 0.075, 1], top: [0.545, 0.271, 0.075, 1]}));
+
+	objects.push(new Pyramidenstumpf(from = {x: -0.04, y: 0.24, z: -0.04}, to = {x: 0.04, y: 0.28, z: 0.04}, 
+		sideColors = {front: [0.545, 0.271, 0.075, 1], right: [0.545, 0.271, 0.075, 1], back: [0.545, 0.271, 0.075, 1], left: [0.545, 0.271, 0.075, 1],
+			bottom: [0.545, 0.271, 0.075, 1], top: [0.545, 0.271, 0.075, 1]}));
+	
+	//Palmenblätter
+	objects.push(new Cube(from = {x: -0.04, y: -0.71, z: -0.2}, to = {x: 0.04, y: -0.715, z: 0.2}, sideColors = {front: [0.000, 0.502, 0.000, 1], right: [0.000, 0.502, 0.000, 1], back: [0.000, 0.502, 0.000, 1], left: [0.000, 0.502, 0.000, 1], bottom: [0.000, 0.502, 0.000, 1], top: [0.000, 0.502, 0.000, 1]}));
+	objects.push(new Cube(from = {x: -0.2, y: -0.71, z: -0.04}, to = {x: 0.2, y: -0.715, z: 0.04}, sideColors = {front: [0.000, 0.502, 0.000, 1], right: [0.000, 0.502, 0.000, 1], back: [0.000, 0.502, 0.000, 1], left: [0.000, 0.502, 0.000, 1], bottom: [0.000, 0.502, 0.000, 1], top: [0.000, 0.502, 0.000, 1]}));
 	
 	// 4. Init shader program via additional function and bind it
 	program = initShaders(gl, "vertex-shader", "fragment-shader");
@@ -349,12 +395,12 @@ function init() {
 
 	// 7 Save attribute location to address them
 	pointLoc = gl.getAttribLocation(program, "vPosition");
-	normalLoc = gl.getAttribLocation(program, "vNormal");
+	colorLoc = gl.getAttribLocation(program, "vColor");
 	modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
 
     // Set view matrix
 	eye = vec3.fromValues(0.0, -0.75, 0.48);
-	target = vec3.fromValues(0.0, 0.0, 0.47);
+	target = vec3.fromValues(0.0, -0.76, 0.47);
 	up = vec3.fromValues(0.0, 1.0, 0.0);
 
 	viewMatrix = mat4.create();
@@ -373,56 +419,6 @@ function init() {
 	projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 	gl.uniformMatrix4fv(projectionMatrixLoc, false, projectionMatrix);
 	
-// 3. Specify vertices
-
-	//Himmel
-
-	let Himmel = new Cube({x: -1.0, y: -1.0, z: -1.0},{x: 1.0, y: 1.0, z: 1.0},{front: [0.529, 0.808, 0.980, 1], right: [0.529, 0.808, 0.980, 1], back: [0.529, 0.808, 0.980, 1], left: [0.529, 0.808, 0.980, 1],
-		bottom: [0.529, 0.808, 0.980, 1], top: [0.529, 0.808, 0.980, 1]});
-	objects.push(Himmel);
-	
-	//Ozean
-	let Ozean = new Cube({x: -1.0, y: -0.99, z: -1.0},{x: 1, y: -0.99, z: 1.0},{front: [0, 1, 1, 1], right: [0, 1, 1, 1], back: [0, 1, 1, 1], left: [0, 1, 1, 1],
-		bottom: [0, 1, 1, 1], top: [0, 1, 1, 1]});	
-	objects.push(Ozean);
-
-	//Strand
-	let Strand = new Cube({x: -0.5, y: -0.99, z: -0.5},{x: 0.5, y: -0.98, z: 0.5});
-	objects.push(Strand);
-	
-	
-	//Palmenstamm
-	let Palmenstamm1 = new Pyramidenstumpf({x: -0.04, y: -0.99, z: -0.04},{x: 0.04, y: -0.95, z: 0.04});
-	objects.push(Palmenstamm1);
-	
-	let Palmenstamm2 = new Pyramidenstumpf({x: -0.04, y: -0.95, z: -0.04},{x: 0.04, y: -0.91, z: 0.04});
-	Palmenstamm2.SetModelMatrix({x: 0, y: 0, z: 0}, {x: 0, y: 45, z: 0});
-	objects.push(Palmenstamm2);
-
-	let Palmenstamm3 = new Pyramidenstumpf({x: -0.04, y: -0.91, z: -0.04},{x: 0.04, y: -0.87, z: 0.04});
-	objects.push(Palmenstamm3);
-
-	let Palmenstamm4 = new Pyramidenstumpf({x: -0.04, y: -0.87, z: -0.04},{x: 0.04, y: -0.83, z: 0.04});
-	objects.push(Palmenstamm4);
-
-	let Palmenstamm5 = new Pyramidenstumpf({x: -0.04, y: -0.83, z: -0.04},{x: 0.04, y: -0.79, z: 0.04});
-	objects.push(Palmenstamm5);
-
-	let Palmenstamm6 = new Pyramidenstumpf({x: -0.04, y: -0.79, z: -0.04},{x: 0.04, y: -0.75, z: 0.04});
-	objects.push(Palmenstamm6);
-
-	let Palmenstamm7 = new Pyramidenstumpf({x: -0.04, y: -0.75, z: -0.04},{x: 0.04, y: -0.71, z: 0.04});
-	objects.push(Palmenstamm7);
-
-	//Palmenblätter
-	let Palmenblatt1 = new Cube({x: -0.04, y: -0.71, z: -0.2},{x: 0.04, y: -0.715, z: 0.2},{front: [0.133, 0.545, 0.133, 1], right: [0.133, 0.545, 0.133, 1], back: [0.133, 0.545, 0.133, 1], left: [0.133, 0.545, 0.133, 1],
-		bottom: [0.133, 0.545, 0.133, 1], top: [0.133, 0.545, 0.133, 1]});
-	objects.push(Palmenblatt1);
-
-	let Palmenblatt2 = new Cube(from = {x: -0.2, y: -0.71, z: -0.04}, to = {x: 0.2, y: -0.715, z: 0.04},{front: [0.133, 0.545, 0.133, 1], right: [0.133, 0.545, 0.133, 1], back: [0.133, 0.545, 0.133, 1], left: [0.133, 0.545, 0.133, 1],
-		bottom: [0.133, 0.545, 0.133, 1], top: [0.133, 0.545, 0.133, 1]});
-	objects.push(Palmenblatt2);
-
 	//Melde Listener an
 	window.addEventListener('keydown', TastenAktion);
 	window.addEventListener('mousemove', MausAktion);
