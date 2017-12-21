@@ -56,7 +56,7 @@ class Pyramidenstumpf {
 			this.orientation = {x: 0, y: 0, z: 0};
 			this.position = {x: 0.0, y: 0.0, z: 0.0};
 			this.verticesVBO = gl.createBuffer();
-			this.modelMatrix = this.SetModelMatrix(this.position, this.orientation);
+			this.SetModelMatrix(this.position, this.orientation);
 	
 			this.MakeModel();
 			this.InitBuffer();
