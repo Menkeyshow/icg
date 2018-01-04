@@ -1,0 +1,97 @@
+<!-- 
+/* ICG
+**
+** Übung 5
+**
+** Gruppe 4_5 
+** Birkenhagen, Maximilian    - 6948018
+** Geislinger, Robert         - 6947836
+** Regorz, Marvin             - 6801009
+** Schönfeldt, Jan Alexander  - 6948115
+** 
+*/
+
+-->
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>Zettel 6</title>
+		
+		<script id="vertex-shader" type="x-shader/x-vertex">
+			attribute vec4 vPosition;
+			attribute vec4 vNormal;
+			
+			uniform mat4 modelMatrix;
+			uniform mat4 viewMatrix;
+			uniform mat4 projectionMatrix;
+			uniform mat4 normalMatrix;
+
+			// TODO: Erhalte hier die Lichtposition
+			uniform vec4 lightPosition;
+
+			// TODO: Speichere alle übergebenen Koeffizienten als Uniform-Variablen
+			uniform vec4 ka;
+			uniform vec4 kd;
+			uniform vec4 ks;
+
+			// TODO: Setze alle Konstanten c_1, c_2, c_3, n als const ein
+			const c_1 = 1;
+			const c_2 = 0.0005;
+			const c_3 = 0.000003;
+			const n	  = 3;
+			
+			// calculated color using the Phong illumination model
+
+			varying vec4 fColor;
+			void main()
+			{
+				// fColor = vColor;
+
+				// TODO: Rechne alle übergebenen Koordinaten (Lichtposition, Normalen) in das Kamerakoordinatensystem um
+				vec3 pos = (viewMatrix * vPosition).xyz;
+				vec3 lightpos = (viewMatrix * lightPosition).xyz;
+
+				// TODO: Berechne und normiere die Vektoren L, N, R und V. 
+				// Denke daran, dass du für die Normierung nur die Koordinaten x, y und z berücksichtigst.
+				vec3 L = normalize(lightpos - pos);
+				vec3 N = normalize(vNormal);
+				vec3 R = reflect(pos, N); //N oder vNormal
+				vec3 V = -normalize(pos); //da wir ja schon in Kamerapos sind????
+			
+				// TODO: Berechne die Koeffizienten d, sowie f_{att}
+				d = length(L);
+				f_att = min(1/(c1+c2*d+c3*d*d),1);
+
+				// TODO: Berechne die Farbe mit der Phong-Beleuchtungsgleichung
+				fColor = Ia * ka + f_att * (Id * kd * max(0,dot(N,L)) + Is * ks * pow(max(0, dot(R,V)),n));
+				gl_Position = projectionMatrix * viewMatrix * modelMatrix * vPosition;
+			}
+		</script>
+		<script id="fragment-shader" type="x-shader/x-fragment">
+			precision mediump float;
+			
+			varying vec4 fColor;
+			
+			void main()
+			{					
+				gl_FragColor = fColor;
+			}
+		</script>
+
+		<script type="text/javascript" src="common/initShaders.js">
+		</script>
+		<script type="text/javascript" src="common/gl-matrix.js">
+		</script>
+	</head>
+	<body>
+
+		<canvas id="gl-canvas" width="512" height="512">
+			If you see this, your browser doesn't support WebGL.
+		</canvas>
+
+		<script type="text/javascript" src="Uebung 5 - Birkenhagen_Geislinger_Regorz_Schoenfeldt.js">
+		</script>
+		
+	</body>
+</html>
