@@ -26,8 +26,11 @@ let pointLoc;
 //let colorLoc;
 let normalsLoc;
 
-//TODO
-
+let lightPositionLoc,
+	lightPosition,
+	IaLoc,
+	IdLoc,
+	IsLoc;
 let kaLoc;
 let kdLoc;
 let ksLoc;
@@ -69,9 +72,9 @@ class Pyramidenstumpf {
 			this.verticesVBO = gl.createBuffer();
 			this.SetModelMatrix(this.position, this.orientation);
 			this.normalMatrix;
-			this.ka = {r: 0.2, g: 0.2, b: 0.2 };
-			this.kd = {r: 0.5, g: 0.2, b: 0.1 };
-			this.ks = {r: 0.0, g: 0.0, b: 0.0 };
+			this.ka = vec3.fromValues(0.2, 0.2, 0.2);
+			this.kd = vec3.fromValues(0.5, 0.2, 0.1);
+			this.ks = vec3.fromValues(0.0, 0.0, 0.0);
 	
 			this.MakeModel();
 			this.InitBuffer();
@@ -142,8 +145,8 @@ class Pyramidenstumpf {
 			this.normals = [
 			// Front
 				((this.from.y-this.from.y)*(this.to.z*(1/2)-this.to.z)-(this.to.z*(1/2)-this.to.z*(1/2))*(this.from.y-this.to.y)),
-				((this.to.z*(1/2)-this.to.z*(1/2))*(this.to.x(1/2)-this.from.x)-(this.from.x*(1/2)-this.to.x*(1/2))*(this.to.z*(1/2)-this.to.z)),
-				((this.from.x*(1/2)-this.to.x*(1/2))*(this.from.y-this.to.y)-(this.from.y-this.from.y)*(this.to.x(1/2)-this.from.x)),
+				((this.to.z*(1/2)-this.to.z*(1/2))*(this.to.x*(1/2)-this.from.x)-(this.from.x*(1/2)-(this.to.x*(1/2)))*(this.to.z*(1/2)-this.to.z)),
+				((this.from.x*(1/2)-this.to.x*(1/2))*(this.from.y-this.to.y)-(this.from.y-this.from.y)*(this.to.x*(1/2)-this.from.x)),
 
 				((this.to.y-this.to.y)*(this.to.z-this.to.z*(1/2))-(this.to.z-this.to.z)*(this.to.y-this.from.y)),
 				((this.to.z-this.to.z)*(this.from.x-this.to.x*(1/2))-(this.to.x-this.from.x)*(this.to.z-this.to.z*(1/2))),
@@ -246,7 +249,14 @@ class Pyramidenstumpf {
 			// Push the matrix to the buffer
 			gl.uniformMatrix4fv(modelMatrixLoc, false, new Float32Array(this.modelMatrix));		
 			gl.uniformMatrix4fv(normalMatrixLoc, false, new Float32Array(this.normalMatrix));
-			// TODO: Übergebe hier die Materialkoeffizienten des Objektes an den Shader		
+
+			//Übergebe hier die Materialkoeffizienten des Objektes an den Shader
+			//gl.uniform3fv(kaLoc, false,  new Float32Array(this.ka));
+			gl.uniform3f(kaLoc, this.ka[0], this.ka[1], this.ka[2]);
+			//gl.uniform3f(ksLoc, false,  new Float32Array(this.ks));
+			gl.uniform3f(ksLoc, this.ks[0], this.ks[1], this.ks[2]);
+			//gl.uniform3f(kdLoc, false,  new Float32Array(this.kd));
+			gl.uniform3f(kdLoc, this.kd[0], this.kd[1], this.kd[2]);
 			
 		}
 	
@@ -262,7 +272,7 @@ class Pyramidenstumpf {
 
 			gl.enableVertexAttribArray(pointLoc);
 			//gl.enableVertexAttribArray(colorLoc);
-			gl.enableVertexAttribArray(normalsLoc);
+//			gl.enableVertexAttribArray(normalsLoc);
 	
 			// Set uniforms
 			this.UpdateBuffer();
@@ -280,16 +290,16 @@ class Cube {
 		this.to = to;
 	
 		this.mesh = [];
-		
+		this.normals = [];
 		this.orientation = {x: 0, y: 0, z: 0};
 		this.position = {x: 0, y: 0, z: 0};
 		this.verticesVBO = gl.createBuffer();
 		this.modelMatrix;
 		this.SetModelMatrix(this.position, this.orientation);
 		this.normalMatrix;
-		this.ka = Colors.ka;
-		this.kd = Colors.kd;
-		this.ks = Colors.ks;
+		this.ka = vec3.fromValues(Colors.ka[0],Colors.ka[1],Colors.ka[2]);
+		this.kd = vec3.fromValues(Colors.kd[0],Colors.kd[1],Colors.kd[2]);
+		this.ks = vec3.fromValues(Colors.ks[0],Colors.ks[1],Colors.ks[2]);
 
 		this.MakeModel();
 		this.InitBuffer();
@@ -357,40 +367,41 @@ class Cube {
 
 		this.normals = [
 			//Front
-			0.0, -0.0, 1.0,
-			0.0, -0.0, 1.0,
-			0.0, -0.0, 1.0,
+			
+			0.0, 0.0, 1.0,
+			0.0, 0.0, 1.0,
+			0.0, 0.0, 1.0,
 
-			0.0, -0.0, 1.0,
-			0.0, -0.0, 1.0,
-			0.0, -0.0, 1.0,
+			0.0, 0.0, 1.0,
+			0.0, 0.0, 1.0,
+			0.0, 0.0, 1.0,
 			
 			//Right
-			1.0, -0.0, 0.0,
-			1.0, -0.0, 0.0,
-			1.0, -0.0, 0.0,
+			1.0, 0.0, 0.0,
+			1.0, 0.0, 0.0,
+			1.0, 0.0, 0.0,
 
-			1.0, -0.0, 0.0,
-			1.0, -0.0, 0.0,
-			1.0, -0.0, 0.0,
+			1.0, 0.0, 0.0,
+			1.0, 0.0, 0.0,
+			1.0, 0.0, 0.0,
 
 			//Back
-			0.0, -0.0 -1.0,
-			0.0, -0.0 -1.0,
-			0.0, -0.0 -1.0,
+			0.0, 0.0, -1.0,
+			0.0, 0.0, -1.0,
+			0.0, 0.0, -1.0,
 
-			0.0, -0.0 -1.0,
-			0.0, -0.0 -1.0,
-			0.0, -0.0 -1.0,
+			0.0, 0.0, -1.0,
+			0.0, 0.0, -1.0,
+			0.0, 0.0, -1.0,
 
 			//Left
-			-1.0, -0.0, 0.0,
-			-1.0, -0.0, 0.0,
-			-1.0, -0.0, 0.0,
+			-1.0, 0.0, 0.0,
+			-1.0, 0.0, 0.0,
+			-1.0, 0.0, 0.0,
 
-			-1.0, -0.0, 0.0,
-			-1.0, -0.0, 0.0,
-			-1.0, -0.0, 0.0,
+			-1.0, 0.0, 0.0,
+			-1.0, 0.0, 0.0,
+			-1.0, 0.0, 0.0,
 
 			//Bottom
 			0.0, -1.0,  0.0,
@@ -408,7 +419,8 @@ class Cube {
 			 
 			0.0,  1.0,  0.0,
 			0.0,  1.0,  0.0,
-			0.0,  1.0,  0.0
+			0.0,  1.0,  0.0			
+
 		];
 	}
 
@@ -453,7 +465,15 @@ class Cube {
 		// Push the matrix to the buffer
 		gl.uniformMatrix4fv(modelMatrixLoc, false, new Float32Array(this.modelMatrix));	
 		gl.uniformMatrix4fv(normalMatrixLoc, false, new Float32Array(this.normalMatrix));
-		// TODO: Übergebe hier die Materialkoeffizienten des Objektes an den Shader		
+
+		//Übergebe hier die Materialkoeffizienten des Objektes an den Shader
+		//gl.uniform3fv(kaLoc, false,  new Float32Array(this.ka));
+		gl.uniform3f(kaLoc, this.ka[0], this.ka[1], this.ka[2]);
+		//gl.uniform3f(ksLoc, false,  new Float32Array(this.ks));
+		gl.uniform3f(ksLoc, this.ks[0], this.ks[1], this.ks[2]);
+		//gl.uniform3f(kdLoc, false,  new Float32Array(this.kd));
+		gl.uniform3f(kdLoc, this.kd[0], this.kd[1], this.kd[2]);
+				
 	
 	}
 
@@ -496,8 +516,10 @@ function init() {
 
 	// 7 Save attribute location to address them
 	pointLoc = gl.getAttribLocation(program, "vPosition");
-	colorLoc = gl.getAttribLocation(program, "vColor");
+	normalsLoc = gl.getAttribLocation(program, "vNormal"); //statt color
 	modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
+
+	
 
     // Set view matrix
 	eye = vec3.fromValues(0.0, -0.75, 0.48);
@@ -521,24 +543,20 @@ function init() {
 	gl.uniformMatrix4fv(projectionMatrixLoc, false, projectionMatrix);
 	
 	// 3. Specify vertices
-	//TODO!!!!! MATERIALKOEFFIZIENTEN!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	
 	//Himmel
-
-	let Himmel = new Cube({x: -1.0, y: -1.0, z: -1.0},{x: 1.0, y: 1.0, z: 1.0}, {ka: [], kd: [], ks: []});
+	let Himmel = new Cube({x: -1.0, y: -1.0, z: -1.0},{x: 1.0, y: 1.0, z: 1.0}, {ka: [0.529, 0.808, 0.922], kd: [0.0, 0.0, 0.0], ks: [0.0, 0.0, 0.0]});
 	objects.push(Himmel);
 	
 	//Ozean
-	let Ozean = new Cube({x: -1.0, y: -0.99, z: -1.0},{x: 1, y: -0.99, z: 1.0}, {ka: [], kd: [], ks: []});	
+	let Ozean = new Cube({x: -1.0, y: -0.99, z: -1.0},{x: 1, y: -0.98, z: 1.0}, {ka: [0.0, 1.0, 1.0], kd: [0.0, 0.8, 0.8], ks: [0.0, 0.6, 0.6]});	//rumspielen!
 	objects.push(Ozean);
 
 	//Strand
-	let Strand = new Cube({x: -0.5, y: -0.99, z: -0.5},{x: 0.5, y: -0.98, z: 0.5}, {ka: [], kd: [], ks: []});
+	let Strand = new Cube({x: -0.5, y: -0.98, z: -0.5},{x: 0.5, y: -0.97, z: 0.5}, {ka: [1.0, 1.0, 0.0], kd: [0.5, 0.5, 0.0], ks: [0.6, 0.6, 0.0]}); //rumspielen!
 	objects.push(Strand);
 	
-	
+	/*
 	//Palmenstamm
 	let Palmenstamm1 = new Pyramidenstumpf({x: -0.04, y: -0.99, z: -0.04},{x: 0.04, y: -0.95, z: 0.04});
 	objects.push(Palmenstamm1);
@@ -561,19 +579,40 @@ function init() {
 
 	let Palmenstamm7 = new Pyramidenstumpf({x: -0.04, y: -0.75, z: -0.04},{x: 0.04, y: -0.71, z: 0.04});
 	objects.push(Palmenstamm7);
+	*/
 
 	//Palmenblätter
-	let Palmenblatt1 = new Cube({x: -0.04, y: -0.71, z: -0.2},{x: 0.04, y: -0.715, z: 0.2}, {ka: [], kd: [], ks: []});
+	let Palmenblatt1 = new Cube({x: -0.04, y: -0.71, z: -0.2},{x: 0.04, y: -0.715, z: 0.2}, {ka: [0.0, 0.2 ,0.0], kd: [0.0, 0.3, 0.0], ks: [0.0, 0.1,0.0]});
 	objects.push(Palmenblatt1);
 
-	let Palmenblatt2 = new Cube(from = {x: -0.2, y: -0.71, z: -0.04}, to = {x: 0.2, y: -0.715, z: 0.04}, {ka: [], kd: [], ks: []});
+	let Palmenblatt2 = new Cube(from = {x: -0.2, y: -0.71, z: -0.04}, to = {x: 0.2, y: -0.715, z: 0.04}, {ka: [0.0, 0.2 ,0.0], kd: [0.0, 0.3,0.0], ks: [0.0, 0.1, 0.0]});
 	objects.push(Palmenblatt2);
 
 
-	// TODO: Hier die Speicherlocations der Normalenmatrix, der Materialkoeffizienten und der Lichtintensitäten in die globalen Variablen speichern
-	
-	// TODO: Setze hier die Lichteigenschaften I als Uniform-Variablen
-	
+	//Hier die Speicherlocations der Normalenmatrix, der Materialkoeffizienten und der Lichtintensitäten in die globalen Variablen speichern
+	normalMatrixLoc = gl.getUniformLocation(program, "normalMatrix");
+	//gl.uniformMatrix4fv(normalMatrixLoc, false, normalMatrix);
+
+	kaLoc = gl.getUniformLocation(program, "ka");
+	kdLoc = gl.getUniformLocation(program, "kd");
+	ksLoc = gl.getUniformLocation(program, "ks");
+
+	//Setze hier die Lichteigenschaften I als Uniform-Variablen
+	lightPositionLoc = gl.getUniformLocation(program, "lightPosition");
+	lightPosition = vec4.fromValues(1.0, 0.8, 0.0, 0.0);
+	gl.uniform4f(lightPositionLoc, 0.9, 0.8, 0.0, 0.0); //passt das so?
+
+	IaLoc = gl.getUniformLocation(program, "Ia");
+	//gl.uniform3fv(IaLoc, false, vec3.fromValues(0.2, 0.2, 0.2));
+	gl.uniform3f(IaLoc, 1.0, 1.0, 1.0);
+
+	IsLoc = gl.getUniformLocation(program, "Is");
+	//gl.uniform3fv(IsLoc, false, vec3.fromValues(0.4, 0.4, 0.4));
+	gl.uniform3f(IaLoc, 0.4, 0.4, 0.4);
+
+	IdLoc = gl.getUniformLocation(program, "Id");
+	//gl.uniform3fv(IdLoc, false, vec3.fromValues(0.2, 0.2, 0.2));
+	gl.uniform3f(IaLoc, 0.2, 0.2, 0.2);
 
 	//Melde Listener an
 	window.addEventListener('keydown', TastenAktion);

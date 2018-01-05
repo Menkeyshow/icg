@@ -20,51 +20,68 @@
 		
 		<script id="vertex-shader" type="x-shader/x-vertex">
 			attribute vec4 vPosition;
-			attribute vec4 vNormal;
+			attribute vec3 vNormal;
 			
 			uniform mat4 modelMatrix;
 			uniform mat4 viewMatrix;
 			uniform mat4 projectionMatrix;
 			uniform mat4 normalMatrix;
 
-			// TODO: Erhalte hier die Lichtposition
+			// Erhalte hier die Lichtposition
 			uniform vec4 lightPosition;
 
-			// TODO: Speichere alle übergebenen Koeffizienten als Uniform-Variablen
-			uniform vec4 ka;
-			uniform vec4 kd;
-			uniform vec4 ks;
+			// Speichere alle übergebenen Koeffizienten als Uniform-Variablen
+			uniform vec3 Ia;
+			uniform vec3 Id;
+			uniform vec3 Is;
 
-			// TODO: Setze alle Konstanten c_1, c_2, c_3, n als const ein
-			const c_1 = 1;
-			const c_2 = 0.0005;
-			const c_3 = 0.000003;
-			const n	  = 3;
+			uniform vec3 ka;
+			uniform vec3 kd;
+			uniform vec3 ks;
+
+			// Setze alle Konstanten c_1, c_2, c_3, n als const ein
+			const float c_1 = 1.0;
+			const float c_2 = 0.0005;
+			const float c_3 = 0.000003;
+			const float n	  = 3.0;
 			
 			// calculated color using the Phong illumination model
 
 			varying vec4 fColor;
+			varying vec3 fColorBerechnung;
+			varying vec3 fColorTest;
 			void main()
 			{
-				// fColor = vColor;
+				float d;
+				float f_att;
 
-				// TODO: Rechne alle übergebenen Koordinaten (Lichtposition, Normalen) in das Kamerakoordinatensystem um
+				// Rechne alle übergebenen Koordinaten (Lichtposition, Normalen) in das Kamerakoordinatensystem um
 				vec3 pos = (viewMatrix * vPosition).xyz;
 				vec3 lightpos = (viewMatrix * lightPosition).xyz;
 
-				// TODO: Berechne und normiere die Vektoren L, N, R und V. 
+				// Berechne und normiere die Vektoren L, N, R und V. 
 				// Denke daran, dass du für die Normierung nur die Koordinaten x, y und z berücksichtigst.
 				vec3 L = normalize(lightpos - pos);
 				vec3 N = normalize(vNormal);
-				vec3 R = reflect(pos, N); //N oder vNormal
+				vec3 R = reflect(pos, N); //N oder vNormal ????
 				vec3 V = -normalize(pos); //da wir ja schon in Kamerapos sind????
 			
-				// TODO: Berechne die Koeffizienten d, sowie f_{att}
+				// Berechne die Koeffizienten d, sowie f_{att}
 				d = length(L);
-				f_att = min(1/(c1+c2*d+c3*d*d),1);
+				f_att = min(1.0/(c_1+c_2*d+c_3*d*d),1.0);
 
-				// TODO: Berechne die Farbe mit der Phong-Beleuchtungsgleichung
-				fColor = Ia * ka + f_att * (Id * kd * max(0,dot(N,L)) + Is * ks * pow(max(0, dot(R,V)),n));
+				// Berechne die Farbe mit der Phong-Beleuchtungsgleichung
+				fColorBerechnung = Ia * ka + f_att * (0.9 * kd * max(0.0,dot(N,L)) + Is * ks * pow(max(0.0, dot(R,V)),n)); //Intensitäten !!
+				fColorTest = Ia * ka;
+				fColor.r = fColorBerechnung.r;
+				fColor.g = fColorBerechnung.g;
+				fColor.b = fColorBerechnung.b;
+				fColor.a = 1.0;
+
+				//clamping :O
+				clamp(fColor, 0.0, 1.0);
+
+			
 				gl_Position = projectionMatrix * viewMatrix * modelMatrix * vPosition;
 			}
 		</script>
