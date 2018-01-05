@@ -63,10 +63,8 @@ class Pyramidenstumpf {
 		constructor (from = {x: -0.5, y: -0.0, z: -0.5}, to = {x: 0.5, y: 0.5, z: 0.5}) {
 			this.from = from;
 			this.to = to;
-			//this.sideColors = sideColors;
 			this.mesh = [];
 			this.normals = [];
-			//this.colors = [];
 			this.orientation = {x: 0, y: 0, z: 0};
 			this.position = {x: 0.0, y: 0.0, z: 0.0};
 			this.verticesVBO = gl.createBuffer();
@@ -272,7 +270,7 @@ class Pyramidenstumpf {
 
 			gl.enableVertexAttribArray(pointLoc);
 			//gl.enableVertexAttribArray(colorLoc);
-//			gl.enableVertexAttribArray(normalsLoc);
+			gl.enableVertexAttribArray(normalsLoc);
 	
 			// Set uniforms
 			this.UpdateBuffer();
