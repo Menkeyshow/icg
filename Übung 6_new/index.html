@@ -71,7 +71,7 @@
 				f_att = min(1.0/(c_1+c_2*d+c_3*d*d),1.0);
 
 				// Berechne die Farbe mit der Phong-Beleuchtungsgleichung
-				fColorBerechnung = Ia * ka + f_att * (0.9 * kd * max(0.0,dot(N,L)) + Is * ks * pow(max(0.0, dot(R,V)),n)); //Intensitäten !!
+				fColorBerechnung = Ia * ka + f_att * (Id * kd * max(0.0,dot(N,L)) + Is * ks * pow(max(0.0, dot(R,V)),n)); //Intensitäten, ist auch noch nicht ganz richtig.. !!
 				fColorTest = Ia * ka;
 				fColor.r = fColorBerechnung.r;
 				fColor.g = fColorBerechnung.g;

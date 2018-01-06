@@ -140,6 +140,8 @@ class Pyramidenstumpf {
 	
 			// Setze die Normalen - ähnlich zu den Positionen 
 			// (Merke: eine Normale ist ein Richtungs- und kein Positionsvektor)
+
+			/*
 			this.normals = [
 			// Front
 				((this.from.y-this.from.y)*(this.to.z*(1/2)-this.to.z)-(this.to.z*(1/2)-this.to.z*(1/2))*(this.from.y-this.to.y)),
@@ -195,7 +197,66 @@ class Pyramidenstumpf {
 				((this.from.z-this.from.z)*(this.from.x-this.to.x)-(this.to.x-this.from.x)*(this.from.z-this.to.z)),
 				((this.to.x-this.from.x)*(this.to.y-this.to.y)-(this.to.y-this.to.y)*(this.from.x-this.to.x))
 		];
+			*/
 			
+			//Diese Normalen sind noch nicht richtig, da müssen wir nochmal richtige y-Werte berechnen.
+			this.normals = [
+			//Front
+			
+			0.0, -0.2, 1.0,
+			0.0, -0.2, 1.0,
+			0.0, -0.2, 1.0,
+
+			0.0, -0.2, 1.0,
+			0.0, -0.2, 1.0,
+			0.0, -0.2, 1.0,
+			
+			//Right
+			1.0, -0.2, 0.0,
+			1.0, -0.2, 0.0,
+			1.0, -0.2, 0.0,
+
+			1.0, -0.2, 0.0,
+			1.0, -0.2, 0.0,
+			1.0, -0.2, 0.0,
+
+			//Back
+			0.0, -0.2, -1.0,
+			0.0, -0.2, -1.0,
+			0.0, -0.2, -1.0,
+
+			0.0, -0.2, -1.0,
+			0.0, -0.2, -1.0,
+			0.0, -0.2, -1.0,
+
+			//Left
+			-1.0, -0.2, 0.0,
+			-1.0, -0.2, 0.0,
+			-1.0, -0.2, 0.0,
+
+			-1.0, -0.2, 0.0,
+			-1.0, -0.2, 0.0,
+			-1.0, -0.2, 0.0,
+
+			//Bottom
+			0.0, -1.0,  0.0,
+			0.0, -1.0,  0.0,
+			0.0, -1.0,  0.0,
+
+			0.0, -1.0,  0.0,
+			0.0, -1.0,  0.0,
+			0.0, -1.0,  0.0,
+
+			//Top
+			0.0,  1.0,  0.0,
+			0.0,  1.0,  0.0,
+			0.0,  1.0,  0.0,
+			 
+			0.0,  1.0,  0.0,
+			0.0,  1.0,  0.0,
+			0.0,  1.0,  0.0			
+
+		];
 			
 
 
@@ -554,7 +615,7 @@ function init() {
 	let Strand = new Cube({x: -0.5, y: -0.98, z: -0.5},{x: 0.5, y: -0.97, z: 0.5}, {ka: [1.0, 1.0, 0.0], kd: [0.5, 0.5, 0.0], ks: [0.6, 0.6, 0.0]}); //rumspielen!
 	objects.push(Strand);
 	
-	/*
+	
 	//Palmenstamm
 	let Palmenstamm1 = new Pyramidenstumpf({x: -0.04, y: -0.99, z: -0.04},{x: 0.04, y: -0.95, z: 0.04});
 	objects.push(Palmenstamm1);
@@ -577,7 +638,7 @@ function init() {
 
 	let Palmenstamm7 = new Pyramidenstumpf({x: -0.04, y: -0.75, z: -0.04},{x: 0.04, y: -0.71, z: 0.04});
 	objects.push(Palmenstamm7);
-	*/
+	
 
 	//Palmenblätter
 	let Palmenblatt1 = new Cube({x: -0.04, y: -0.71, z: -0.2},{x: 0.04, y: -0.715, z: 0.2}, {ka: [0.0, 0.2 ,0.0], kd: [0.0, 0.3, 0.0], ks: [0.0, 0.1,0.0]});
