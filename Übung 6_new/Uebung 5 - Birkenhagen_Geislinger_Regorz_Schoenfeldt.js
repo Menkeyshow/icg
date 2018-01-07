@@ -70,9 +70,9 @@ class Pyramidenstumpf {
 			this.verticesVBO = gl.createBuffer();
 			this.SetModelMatrix(this.position, this.orientation);
 			this.normalMatrix;
-			this.ka = vec3.fromValues(0.2, 0.2, 0.2);
-			this.kd = vec3.fromValues(0.5, 0.2, 0.1);
-			this.ks = vec3.fromValues(0.0, 0.0, 0.0);
+			this.ka = vec3.fromValues(0.218, 0.1084, 0.030);
+			this.kd = vec3.fromValues(0.545, 0.271, 0.075);
+			this.ks = vec3.fromValues(0.545, 0.271, 0.075);
 	
 			this.MakeModel();
 			this.InitBuffer();
@@ -203,40 +203,40 @@ class Pyramidenstumpf {
 			this.normals = [
 			//Front
 			
-			0.0, -0.2, 1.0,
-			0.0, -0.2, 1.0,
-			0.0, -0.2, 1.0,
+			0.0, -0.3, -1.0,
+			0.0, -0.3, -1.0,
+			0.0, -0.3, -1.0,
 
-			0.0, -0.2, 1.0,
-			0.0, -0.2, 1.0,
-			0.0, -0.2, 1.0,
+			0.0, -0.3, -1.0,
+			0.0, -0.3, -1.0,
+			0.0, -0.3, -1.0,
 			
 			//Right
-			1.0, -0.2, 0.0,
-			1.0, -0.2, 0.0,
-			1.0, -0.2, 0.0,
+			1.0, -0.3, 0.0,
+			1.0, -0.3, 0.0,
+			1.0, -0.3, 0.0,
 
-			1.0, -0.2, 0.0,
-			1.0, -0.2, 0.0,
-			1.0, -0.2, 0.0,
+			1.0, -0.3, 0.0,
+			1.0, -0.3, 0.0,
+			1.0, -0.3, 0.0,
 
 			//Back
-			0.0, -0.2, -1.0,
-			0.0, -0.2, -1.0,
-			0.0, -0.2, -1.0,
+			0.0, -0.3, 1.0,
+			0.0, -0.3, 1.0,
+			0.0, -0.3, 1.0,
 
-			0.0, -0.2, -1.0,
-			0.0, -0.2, -1.0,
-			0.0, -0.2, -1.0,
+			0.0, -0.3, -1.0,
+			0.0, -0.3, -1.0,
+			0.0, -0.3, -1.0,
 
 			//Left
-			-1.0, -0.2, 0.0,
-			-1.0, -0.2, 0.0,
-			-1.0, -0.2, 0.0,
+			-1.0, -0.3, 0.0,
+			-1.0, -0.3, 0.0,
+			-1.0, -0.3, 0.0,
 
-			-1.0, -0.2, 0.0,
-			-1.0, -0.2, 0.0,
-			-1.0, -0.2, 0.0,
+			-1.0, -0.3, 0.0,
+			-1.0, -0.3, 0.0,
+			-1.0, -0.3, 0.0,
 
 			//Bottom
 			0.0, -1.0,  0.0,
@@ -427,13 +427,13 @@ class Cube {
 		this.normals = [
 			//Front
 			
-			0.0, 0.0, 1.0,
-			0.0, 0.0, 1.0,
-			0.0, 0.0, 1.0,
+			0.0, 0.0, -1.0,
+			0.0, 0.0, -1.0,
+			0.0, 0.0, -1.0,
 
-			0.0, 0.0, 1.0,
-			0.0, 0.0, 1.0,
-			0.0, 0.0, 1.0,
+			0.0, 0.0, -1.0,
+			0.0, 0.0, -1.0,
+			0.0, 0.0, -1.0,
 			
 			//Right
 			1.0, 0.0, 0.0,
@@ -445,13 +445,13 @@ class Cube {
 			1.0, 0.0, 0.0,
 
 			//Back
-			0.0, 0.0, -1.0,
-			0.0, 0.0, -1.0,
-			0.0, 0.0, -1.0,
+			0.0, 0.0, 1.0,
+			0.0, 0.0, 1.0,
+			0.0, 0.0, 1.0,
 
-			0.0, 0.0, -1.0,
-			0.0, 0.0, -1.0,
-			0.0, 0.0, -1.0,
+			0.0, 0.0, 1.0,
+			0.0, 0.0, 1.0,
+			0.0, 0.0, 1.0,
 
 			//Left
 			-1.0, 0.0, 0.0,
@@ -658,20 +658,20 @@ function init() {
 
 	//Setze hier die Lichteigenschaften I als Uniform-Variablen
 	lightPositionLoc = gl.getUniformLocation(program, "lightPosition");
-	lightPosition = vec4.fromValues(1.0, 0.8, 0.0, 0.0);
-	gl.uniform4f(lightPositionLoc, 0.9, 0.8, 0.0, 0.0); //passt das so?
+	//lightPosition = vec4.fromValues(1.0, 0.8, 0.0, 0.0);
+	gl.uniform4f(lightPositionLoc, 0.0, -0.80, 0.0, 0.0); // Ecke vorne Links mit (0.0,-0.8,0.0)
 
 	IaLoc = gl.getUniformLocation(program, "Ia");
 	//gl.uniform3fv(IaLoc, false, vec3.fromValues(0.2, 0.2, 0.2));
-	gl.uniform3f(IaLoc, 1.0, 1.0, 1.0);
+	gl.uniform3f(IaLoc, 0.5, 0.5, 0.5);
 
 	IsLoc = gl.getUniformLocation(program, "Is");
 	//gl.uniform3fv(IsLoc, false, vec3.fromValues(0.4, 0.4, 0.4));
-	gl.uniform3f(IaLoc, 0.4, 0.4, 0.4);
+	gl.uniform3f(IsLoc, 1.0, 1.0, 1.0);
 
 	IdLoc = gl.getUniformLocation(program, "Id");
 	//gl.uniform3fv(IdLoc, false, vec3.fromValues(0.2, 0.2, 0.2));
-	gl.uniform3f(IaLoc, 0.2, 0.2, 0.2);
+	gl.uniform3f(IdLoc, 0.2, 0.2, 0.2);
 
 	//Melde Listener an
 	window.addEventListener('keydown', TastenAktion);
