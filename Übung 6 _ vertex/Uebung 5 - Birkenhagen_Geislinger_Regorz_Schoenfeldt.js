@@ -140,66 +140,6 @@ class Pyramidenstumpf {
 	
 			// Setze die Normalen - ähnlich zu den Positionen 
 			// (Merke: eine Normale ist ein Richtungs- und kein Positionsvektor)
-
-			/*
-			this.normals = [
-			// Front
-				((this.from.y-this.from.y)*(this.to.z*(1/2)-this.to.z)-(this.to.z*(1/2)-this.to.z*(1/2))*(this.from.y-this.to.y)),
-				((this.to.z*(1/2)-this.to.z*(1/2))*(this.to.x*(1/2)-this.from.x)-(this.from.x*(1/2)-(this.to.x*(1/2)))*(this.to.z*(1/2)-this.to.z)),
-				((this.from.x*(1/2)-this.to.x*(1/2))*(this.from.y-this.to.y)-(this.from.y-this.from.y)*(this.to.x*(1/2)-this.from.x)),
-
-				((this.to.y-this.to.y)*(this.to.z-this.to.z*(1/2))-(this.to.z-this.to.z)*(this.to.y-this.from.y)),
-				((this.to.z-this.to.z)*(this.from.x-this.to.x*(1/2))-(this.to.x-this.from.x)*(this.to.z-this.to.z*(1/2))),
-				((this.to.x-this.from.x)*(this.to.y-this.from.y)-(this.to.y-this.to.y)*(this.from.x-this.to.x*(1/2))),
-
-				// Right
-				((this.to.y-this.from.y)*(this.to.z*(1/2)-this.from.z*(1/2))-(this.to.z-this.to.z*(1/2))*(this.from.y-this.from.y)),
-				((this.to.z-this.to.z*(1/2))*(this.to.x*(1/2)-this.to.x*(1/2))-(this.to.x-this.to.x*(1/2))*(this.to.z*(1/2)-this.from.z*(1/2))),
-				((this.to.x-this.to.x*(1/2))*(this.from.y-this.from.y)-(this.to.y-this.from.y)*(this.to.x*(1/2)-this.to.x*(1/2))),
-
-				((this.to.y-this.to.y)*(this.to.z-this.from.z*(1/2))-(this.from.z-this.to.z)*(this.to.y-this.from.y)),
-				((this.to.x-this.to.x)*(this.to.y-this.from.y)-(this.to.x-this.to.x)*(this.to.z-this.from.z*(1/2))),
-				((this.to.x-this.to.x)*(this.to.y-this.from.y)-(this.to.y-this.to.y)*(this.to.x-this.to.x*(1/2))),
-
-				// Back
-				((this.from.y-this.from.y)*(this.from.z*(1/2)-this.from.z)-(this.from.z*(1/2)-this.from.z*(1/2)*(this.from.y-this.to.y))),
-				((this.from.z*(1/2)-this.from.z*(1/2))*(this.to.x*(1/2)-this.from.x)-(this.from.x*(1/2)-this.to.x*(1/2))*(this.from.z*(1/2)-this.from.z)),
-				((this.from.x*(1/2)-this.to.x*(1/2))*(this.from.y-this.to.y)-(this.from.y-this.from.y)*(this.to.x*(1/2)-this.from.x)),
-
-				((this.to.y-this.to.y)*(this.from.z-this.from.z*(1/2))-(this.from.z-this.from.z)*(this.to.y-this.from.y)),
-				((this.from.z-this.from.z)*(this.from.x-this.to.x*(1/2))-(this.to.x-this.from.x)*(this.from.z-this.from.z*(1/2))),
-				((this.to.x-this.from.x)*(this.to.y-this.from.y)-(this.to.y-this.to.y)*(this.from.x-this.to.x*(1/2))),
-
-				// Left
-				((this.to.y-this.from.y)*(this.to.z*(1/2)-this.from.z*(1/2))-(this.to.z-this.to.z*(1/2))*(this.from.y-this.from.y)),
-				((this.to.z-this.to.z*(1/2))*(this.from.x*(1/2)-this.from.x*(1/2))-(this.from.x-this.from.x*(1/2))*(this.to.z*(1/2)-this.from.z*(1/2))),
-				((this.from.x-this.from.x*(1/2))*(this.from.y-this.from.y)-(this.to.y-this.from.y)*(this.from.x*(1/2)-this.from.x*(1/2))),
-
-				((this.to.y-this.to.y)*(this.to.z-this.from.z*(1/2))-(this.from.z-this.to.z)*(this.to.y-this.from.y)),
-				((this.from.z-this.to.z)*(this.from.x-this.from.x*(1/2))-(this.from.x-this.from.x)*(this.to.z-this.from.z*(1/2))),
-				((this.from.x-this.from.x)*(this.to.y-this.from.y)-(this.to.y-this.to.y)*(this.from.x-this.from.x*(1/2))),
-
-				// Bottom
-				((this.from.y-this.from.y)*(this.from.z*(1/2)-this.to.z*(1/2))-(this.to.z*(1/2)-this.from.z*(1/2))*(this.from.y-this.from.y)),
-				((this.to.z*(1/2)-this.from.z*(1/2))*(this.from.x*(1/2)-this.to.x*(1/2))-(this.from.x*(1/2)-this.from.x*(1/2))*(this.from.z*(1/2)-this.to.z*(1/2))),
-				((this.from.x*(1/2)-this.from.x*(1/2))*(this.from.y-this.from.y)-(this.from.y-this.from.y)*(this.from.x*(1/2)-this.to.x*(1/2))),
-
-				((this.from.y-this.from.y)*(this.from.z*(1/2)-this.to.z*(1/2))-(this.from.z*(1/2)-this.from.z*(1/2))*(this.from.y-this.from.y)),
-				((this.from.z*(1/2)-this.from.z*(1/2))*(this.from.x*(1/2)-this.to.x*(1/2))-(this.to.x*(1/2)-this.from.x*(1/2))*(this.from.z*(1/2)-this.to.z*(1/2))),
-				((this.to.x*(1/2)-this.from.x*(1/2))*(this.from.y-this.from.y)-(this.from.y-this.from.y)*(this.from.x*(1/2)-this.to.x*(1/2))),
-
-				// Top
-				((this.to.y-this.to.y)*(this.from.z-this.to.z)-(this.to.z-this.from.z)*(this.to.y-this.to.y)),
-				((this.to.z-this.from.z)*(this.from.x-this.to.x)-(this.from.x-this.from.x)*(this.from.z-this.to.z)),
-				((this.from.x-this.from.x)*(this.to.y-this.to.y)-(this.to.y-this.to.y)*(this.from.x-this.to.x)),
-	
-				((this.to.y-this.to.y)*(this.from.z-this.to.z)-(this.from.z-this.from.z)*(this.to.y-this.to.y)),
-				((this.from.z-this.from.z)*(this.from.x-this.to.x)-(this.to.x-this.from.x)*(this.from.z-this.to.z)),
-				((this.to.x-this.from.x)*(this.to.y-this.to.y)-(this.to.y-this.to.y)*(this.from.x-this.to.x))
-		];
-			*/
-			
-			//Diese Normalen sind noch nicht richtig, da müssen wir nochmal richtige y-Werte berechnen.
 			this.normals = [
 			//Front
 			
@@ -310,11 +250,8 @@ class Pyramidenstumpf {
 			gl.uniformMatrix4fv(normalMatrixLoc, false, new Float32Array(this.normalMatrix));
 
 			//Übergebe hier die Materialkoeffizienten des Objektes an den Shader
-			//gl.uniform3fv(kaLoc, false,  new Float32Array(this.ka));
 			gl.uniform3f(kaLoc, this.ka[0], this.ka[1], this.ka[2]);
-			//gl.uniform3f(ksLoc, false,  new Float32Array(this.ks));
 			gl.uniform3f(ksLoc, this.ks[0], this.ks[1], this.ks[2]);
-			//gl.uniform3f(kdLoc, false,  new Float32Array(this.kd));
 			gl.uniform3f(kdLoc, this.kd[0], this.kd[1], this.kd[2]);
 			
 		}
@@ -326,11 +263,9 @@ class Pyramidenstumpf {
 	
 			// Set attribute pointers and enable them
 			gl.vertexAttribPointer(pointLoc, 3, gl.FLOAT, false, 0, 0);
-			//gl.vertexAttribPointer(colorLoc, 4, gl.FLOAT, false, 0, this.mesh.length*4);
 			gl.vertexAttribPointer(normalsLoc, 3, gl.FLOAT, false, 0, this.mesh.length*4);
 
 			gl.enableVertexAttribArray(pointLoc);
-			//gl.enableVertexAttribArray(colorLoc);
 			gl.enableVertexAttribArray(normalsLoc);
 	
 			// Set uniforms
@@ -347,7 +282,6 @@ class Cube {
 		Colors = {ka: [1, 1, 0], kd: [1, 1, 0], ks: [1, 1, 0]}) {
 		this.from = from;
 		this.to = to;
-	
 		this.mesh = [];
 		this.normals = [];
 		this.orientation = {x: 0, y: 0, z: 0};
@@ -426,7 +360,6 @@ class Cube {
 
 		this.normals = [
 			//Front
-			
 			0.0, 0.0, -1.0,
 			0.0, 0.0, -1.0,
 			0.0, 0.0, -1.0,
@@ -526,11 +459,8 @@ class Cube {
 		gl.uniformMatrix4fv(normalMatrixLoc, false, new Float32Array(this.normalMatrix));
 
 		//Übergebe hier die Materialkoeffizienten des Objektes an den Shader
-		//gl.uniform3fv(kaLoc, false,  new Float32Array(this.ka));
 		gl.uniform3f(kaLoc, this.ka[0], this.ka[1], this.ka[2]);
-		//gl.uniform3f(ksLoc, false,  new Float32Array(this.ks));
 		gl.uniform3f(ksLoc, this.ks[0], this.ks[1], this.ks[2]);
-		//gl.uniform3f(kdLoc, false,  new Float32Array(this.kd));
 		gl.uniform3f(kdLoc, this.kd[0], this.kd[1], this.kd[2]);
 				
 	
@@ -621,7 +551,6 @@ function init() {
 	objects.push(Palmenstamm1);
 	
 	let Palmenstamm2 = new Pyramidenstumpf({x: -0.04, y: -0.95, z: -0.04},{x: 0.04, y: -0.91, z: 0.04});
-	//Palmenstamm2.SetModelMatrix({x: 0, y: 0, z: 0}, {x: 0, y: 45, z: 0});
 	objects.push(Palmenstamm2);
 
 	let Palmenstamm3 = new Pyramidenstumpf({x: -0.04, y: -0.91, z: -0.04},{x: 0.04, y: -0.87, z: 0.04});
@@ -650,7 +579,6 @@ function init() {
 
 	//Hier die Speicherlocations der Normalenmatrix, der Materialkoeffizienten und der Lichtintensitäten in die globalen Variablen speichern
 	normalMatrixLoc = gl.getUniformLocation(program, "normalMatrix");
-	//gl.uniformMatrix4fv(normalMatrixLoc, false, normalMatrix);
 
 	kaLoc = gl.getUniformLocation(program, "ka");
 	kdLoc = gl.getUniformLocation(program, "kd");
@@ -658,19 +586,15 @@ function init() {
 
 	//Setze hier die Lichteigenschaften I als Uniform-Variablen
 	lightPositionLoc = gl.getUniformLocation(program, "lightPosition");
-	//lightPosition = vec4.fromValues(1.0, 0.8, 0.0, 0.0);
 	gl.uniform4f(lightPositionLoc, 0.0, -0.80, 0.0, 0.0); // Ecke vorne Links mit (0.0,-0.8,0.0)
 
 	IaLoc = gl.getUniformLocation(program, "Ia");
-	//gl.uniform3fv(IaLoc, false, vec3.fromValues(0.2, 0.2, 0.2));
 	gl.uniform3f(IaLoc, 0.5, 0.5, 0.5);
 
 	IsLoc = gl.getUniformLocation(program, "Is");
-	//gl.uniform3fv(IsLoc, false, vec3.fromValues(0.4, 0.4, 0.4));
 	gl.uniform3f(IsLoc, 1.0, 1.0, 1.0);
 
 	IdLoc = gl.getUniformLocation(program, "Id");
-	//gl.uniform3fv(IdLoc, false, vec3.fromValues(0.2, 0.2, 0.2));
 	gl.uniform3f(IdLoc, 0.2, 0.2, 0.2);
 
 	//Melde Listener an

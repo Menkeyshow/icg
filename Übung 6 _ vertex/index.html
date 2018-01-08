@@ -66,8 +66,8 @@
 				// Denke daran, dass du für die Normierung nur die Koordinaten x, y und z berücksichtigst.
 				vec3 L = normalize(lightpos - pos);
 				vec3 N = normalize(vNormal);
-				vec3 R = reflect(pos, N); 				//N oder vNormal ????
-				vec3 V = -normalize(pos);			   //da wir ja schon in Kamerapos sind????
+				vec3 R = reflect(pos, N); 				
+				vec3 V = -normalize(pos);			   
 			
 				// Berechne die Koeffizienten d, sowie f_{att}
 				d = length(lightpos - pos);
@@ -80,7 +80,7 @@
 				fColor.b = fColorBerechnung.b; 
 				fColor.a = 1.0;
 
-				//clamping :O
+				//clamping
 				clamp(fColor, 0.0, 1.0);
 
 			
