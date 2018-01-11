@@ -1,0 +1,88 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>Zettel 6 - Aufgabe 1</title>
+		
+		<script id="vertex-shader" type="x-shader/x-vertex">
+			attribute vec4 vPosition; 
+			attribute vec3 vNormal; // TO DO: Normalen als attribute übergeben
+			
+			uniform mat4 modelMatrix;
+			uniform mat4 viewMatrix;
+			uniform mat4 projectionMatrix;
+
+			uniform mat4 normalMatrix; // TODO: erhalte hier die Normalmatrix
+			uniform vec3 lightPosition; // TODO: erhalte hier die Lichtposition
+
+			varying vec4 position;
+			varying vec4 lightPos; // TODO: übergebe die Lichtposition an den Fragment Shader
+			varying vec4 normal;
+
+			void main()
+			{
+				// TODO: Rechne alle übergebenen Koordinaten (Lichtposition, Normalen) in das Kamerakoordinatensystem um
+				normal = normalMatrix * vec4(vNormal, 0.0);
+				lightPos = viewMatrix * vec4(lightPosition, 1);
+				
+				mat4 modelViewMatrix = viewMatrix * modelMatrix;
+				position = modelViewMatrix * vPosition;
+				
+				// Caclulate the illumination
+				gl_Position = projectionMatrix * position;
+			}
+		</script>
+		<script id="fragment-shader" type="x-shader/x-fragment">
+			precision mediump float;
+
+			// TODO: Speichere alle übergebenen Koeffizienten als Uniform-Variablen
+			uniform vec4 Ia;
+			uniform vec4 Id;
+			uniform vec4 Is;
+			uniform vec4 ka;
+			uniform vec4 kd; 
+			uniform vec4 ks;
+			uniform float n;
+
+			// TODO: Setze alle Konstanten c_1, c_2, c_3, n als const ein
+			const float c1 = 1.0;
+			const float c2 = 0.0005;
+			const float c3 = 0.000003;
+			
+			varying vec4 position;
+			varying vec4 lightPos; // TODO: Speichere die vom Shader übergebene Lichtposition
+			varying vec4 normal;
+			
+			void main()
+			{				
+				// TODO: Berechne und normalisiere die Vektoren L, N, R und V
+				vec3 N = normalize(normal.xyz);
+				vec3 L = normalize((lightPos - position).xyz);
+				vec3 V = normalize((-position).xyz);
+				vec3 R = reflect(-L, N);
+
+				// TODO: Berechne die Distanz d, sowie f_{att}
+				float d = distance(lightPos, position);
+				float fAtt = min(1.0/c1 + c2 * d + c3 * pow(d, 2.0), 1.0);
+
+				// TODO: Berechne die Farbe anhand der Phong-Beleuchtungsgleichung
+				gl_FragColor =  Ia * ka + fAtt * (Id * kd * max(dot(N, L), 0.0) + Is * ks * pow(max(dot(R, V), 0.0), n));
+			}
+		</script>
+
+		<script type="text/javascript" src="common/initShaders.js">
+		</script>
+		<script type="text/javascript" src="common/gl-matrix.js">
+		</script>
+	</head>
+	<body>
+
+		<canvas id="gl-canvas" width="512" height="512">
+			If you see this, your browser doesn't support WebGL.
+		</canvas>
+
+		<script type="text/javascript" src="cube.js">
+		</script>
+		
+	</body>
+</html>
