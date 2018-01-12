@@ -47,9 +47,14 @@ let viewMatrixLoc,
 let projectionMatrixLoc,
 	projectionMatrix;
 
-let eye, target, up;
-
-let mouseX, mouseY;
+	let keyPressed = {
+		KeyW: false,
+		KeyA: false,
+		KeyS: false,
+		KeyD: false
+	};
+	
+	const speed = 0.02;
 
 let perspectiveHAngle = 270;
 let perspectiveVAngle= 0 ;
@@ -63,18 +68,18 @@ class Pyramidenstumpf {
 		constructor (from = {x: -0.5, y: -0.0, z: -0.5}, to = {x: 0.5, y: 0.5, z: 0.5}) {
 			this.from = from;
 			this.to = to;
-			this.mesh = [];
-			this.normals = [];
+			this.mesh;
+			this.normals;
 			this.orientation = {x: 0, y: 0, z: 0};
 			this.position = {x: 0.0, y: 0.0, z: 0.0};
 			this.verticesVBO = gl.createBuffer();
 			this.modelMatrix;
-			this.SetModelMatrix(this.position, this.orientation);
 			this.normalMatrix;
 			this.ka = vec4.fromValues(0.218, 0.1084, 0.030, 1.0);
 			this.kd = vec4.fromValues(0.545, 0.271, 0.075, 1.0);
 			this.ks = vec4.fromValues(0.0, 0.0, 0.0, 1.0);
 	
+			this.SetModelMatrix(this.position, this.orientation);
 			this.MakeModel();
 			this.InitBuffer();
 		}
@@ -208,10 +213,14 @@ class Pyramidenstumpf {
 		 * @param {Object} position x,y,z
 		 * @param {Object} orientation x,y,z - angles in degree
 		 */
-		SetModelMatrix (position, orientation) {
+		SetModelMatrix (position = this.position, orientation = this.orientation) {
 		
 			// Convert the orientation to RAD
+			this.position = position;
+			this.orientation = orientation;
+
 			orientation = {x: degToRad(orientation.x), y: degToRad(orientation.y), z: degToRad(orientation.z)};
+	
 		
 			// Set the transformation matrix
 			this.modelMatrix = mat4.create();
@@ -224,9 +233,12 @@ class Pyramidenstumpf {
 			//(Erstelle hier die Normalenmatrix und speichere sie in die Variable this.normalMatrix
 			//       Errechne dafür zunächst die modelMatrix im Weltkoordinatensystem, indem du sie mit der
 			//       viewMatrix multiplizierst. Erzeuge dann die transponierte, inverse Normalenmatrix)
+			let modelViewMatrix = mat4.create();
+			mat4.multiply(modelViewMatrix, viewMatrix, this.modelMatrix);
 			this.normalMatrix = mat4.create();
-			mat4.invert(this.normalMatrix,(modelMatrix * viewMatrix));
-			mat4.transpose(this.normalMatrix,this.normalMatrix);
+			mat4.transpose(this.normalMatrix, modelViewMatrix);
+			mat4.invert(this.normalMatrix, this.normalMatrix);
+
 		}
 	
 		/**
@@ -246,6 +258,10 @@ class Pyramidenstumpf {
 		 * Updates the model matrix to the buffer
 		 */
 		UpdateBuffer () {
+			gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesVBO);
+
+			this.SetModelMatrix();
+
 			// Push the matrix to the buffer
 			gl.uniformMatrix4fv(modelMatrixLoc, false, new Float32Array(this.modelMatrix));		
 			gl.uniformMatrix4fv(normalMatrixLoc, false, new Float32Array(this.normalMatrix));
@@ -283,18 +299,18 @@ class Cube {
 		Colors = {ka: [1, 1, 0, 1], kd: [1, 1, 0, 1], ks: [1, 1, 0, 1]}) {
 		this.from = from;
 		this.to = to;
-		this.mesh = [];
-		this.normals = [];
+		this.mesh;
+		this.normals;
 		this.orientation = {x: 0, y: 0, z: 0};
 		this.position = {x: 0, y: 0, z: 0};
 		this.verticesVBO = gl.createBuffer();
 		this.modelMatrix;
-		this.SetModelMatrix(this.position, this.orientation);
 		this.normalMatrix;
 		this.ka = vec4.fromValues(Colors.ka[0],Colors.ka[1],Colors.ka[2],Colors.ka[3]);
 		this.kd = vec4.fromValues(Colors.kd[0],Colors.kd[1],Colors.kd[2],Colors.kd[3]);
 		this.ks = vec4.fromValues(Colors.ks[0],Colors.ks[1],Colors.ks[2],Colors.ks[3]);
 
+		this.SetModelMatrix(this.position, this.orientation);
 		this.MakeModel();
 		this.InitBuffer();
 	}
@@ -422,23 +438,33 @@ class Cube {
 	 * @param {Object} position x,y,z
 	 * @param {Object} orientation x,y,z - angles in degree
 	 */
-	SetModelMatrix (position, orientation) {
+	SetModelMatrix (position = this.position, orientation = this.orientation) {
 		
-			// Convert the orientation to RAD
-			orientation = {x: degToRad(orientation.x), y: degToRad(orientation.y), z: degToRad(orientation.z)};
-		
-			// Set the transformation matrix
-			this.modelMatrix = mat4.create();
-			mat4.translate(this.modelMatrix, this.modelMatrix, [position.x, position.y, position.z]);
-			mat4.rotate(this.modelMatrix, this.modelMatrix, orientation.x, [1, 0, 0]);
-			mat4.rotate(this.modelMatrix, this.modelMatrix, orientation.y, [0, 1, 0]);
-			mat4.rotate(this.modelMatrix, this.modelMatrix, orientation.z, [0, 0, 1]);
+		// Convert the orientation to RAD
+		this.position = position;
+		this.orientation = orientation;
 
-			this.normalMatrix = mat4.create();
-			mat4.invert(this.normalMatrix,(modelMatrix * viewMatrix));
-			mat4.transpose(this.normalMatrix,this.normalMatrix);
-		}
+		orientation = {x: degToRad(orientation.x), y: degToRad(orientation.y), z: degToRad(orientation.z)};
 
+	
+		// Set the transformation matrix
+		this.modelMatrix = mat4.create();
+		mat4.translate(this.modelMatrix, this.modelMatrix, [position.x, position.y, position.z]);
+		mat4.rotate(this.modelMatrix, this.modelMatrix, orientation.x, [1, 0, 0]);
+		mat4.rotate(this.modelMatrix, this.modelMatrix, orientation.y, [0, 1, 0]);
+		mat4.rotate(this.modelMatrix, this.modelMatrix, orientation.z, [0, 0, 1]);
+
+		//Set the normalmatrix 
+		//(Erstelle hier die Normalenmatrix und speichere sie in die Variable this.normalMatrix
+		//       Errechne dafür zunächst die modelMatrix im Weltkoordinatensystem, indem du sie mit der
+		//       viewMatrix multiplizierst. Erzeuge dann die transponierte, inverse Normalenmatrix)
+		let modelViewMatrix = mat4.create();
+		mat4.multiply(modelViewMatrix, viewMatrix, this.modelMatrix);
+		this.normalMatrix = mat4.create();
+		mat4.transpose(this.normalMatrix, modelViewMatrix);
+		mat4.invert(this.normalMatrix, this.normalMatrix);
+
+	}
 	/**
 	 * Sets the buffer data
 	 */
@@ -506,30 +532,39 @@ function init() {
 
 	// 7 Save attribute location to address them
 	pointLoc = gl.getAttribLocation(program, "vPosition");
-	normalsLoc = gl.getAttribLocation(program, "vNormal"); //statt color
 	modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
-
 	
-
+	viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
+	projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
+	
+	//Hier die Speicherlocations der Normalenmatrix, der Materialkoeffizienten und der Lichtintensitäten in die globalen Variablen speichern
+	normalsLoc = gl.getAttribLocation(program, "vNormal"); //statt color
+	normalMatrixLoc = gl.getUniformLocation(program, "normalMatrix");
+	lightPositionLoc = gl.getUniformLocation(program, "lightPosition");
+	
     // Set view matrix
 	eye = vec3.fromValues(0.0, -0.75, 0.48);
-	target = vec3.fromValues(0.0, 0.0, 0.47);
+	target = vec3.fromValues(0.0, -0.75, 0.0);
 	up = vec3.fromValues(0.0, 1.0, 0.0);
 
 	viewMatrix = mat4.create();
 	mat4.lookAt(viewMatrix, eye, target, up);
 
-	// 7 Save uniform location and save the view matrix into it
-	viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
-	gl.uniformMatrix4fv(viewMatrixLoc, false, viewMatrix);
-
-    // Set projection matrix
-
 	projectionMatrix = mat4.create();
 	mat4.perspective(projectionMatrix, Math.PI * 0.4, canvas.width / canvas.height, 0.1, 100);
 
+	// 7 Save uniform location and save the view matrix into it
+	gl.uniformMatrix4fv(viewMatrixLoc, false, viewMatrix);
+
+    gl.uniform3fv(lightPositionLoc, [0.5, -0.5, 0.5]); // Ecke vorne Links mit (0.0,-0.8,0.0)
+	
+	document.addEventListener("keydown", keydown);
+	document.addEventListener("keyup", keyup);
+	document.addEventListener("mousemove", changeView);
+	canvas.onmousedown = function() {
+        canvas.requestPointerLock();
+	}
 	// 7 Save uniform location and save the projection matrix into it
-	projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 	gl.uniformMatrix4fv(projectionMatrixLoc, false, projectionMatrix);
 	
 	// 3. Specify vertices
@@ -582,31 +617,24 @@ function init() {
 	objects.push(Palmenblatt2);
 
 
-	//Hier die Speicherlocations der Normalenmatrix, der Materialkoeffizienten und der Lichtintensitäten in die globalen Variablen speichern
-	normalMatrixLoc = gl.getUniformLocation(program, "normalMatrix");
-
+	
 	kaLoc = gl.getUniformLocation(program, "ka");
 	kdLoc = gl.getUniformLocation(program, "kd");
 	ksLoc = gl.getUniformLocation(program, "ks");
 
 	//Setze hier die Lichteigenschaften I als Uniform-Variablen
-	lightPositionLoc = gl.getUniformLocation(program, "lightPosition");
-	gl.uniform3f(lightPositionLoc, 0.5, -0.5, 0.0); // Ecke vorne Links mit (0.0,-0.8,0.0)
-
+	
 	IaLoc = gl.getUniformLocation(program, "Ia");
-	gl.uniform4f(IaLoc, 0.3, 0.3, 0.3, 1.0);
+	gl.uniform4fv (IaLoc, [0.3, 0.3, 0.3, 1.0]);
 
 	IdLoc = gl.getUniformLocation(program, "Id");
-	gl.uniform4f(IdLoc, 0.8, 0.8, 0.8, 1.0);
+	gl.uniform4fv(IdLoc, [0.8, 0.8, 0.8, 1.0]);
 
 	IsLoc = gl.getUniformLocation(program, "Is");
-	gl.uniform4f(IsLoc, 0.2, 0.2, 0.2, 1.0);
+	gl.uniform4fv(IsLoc, [0.2, 0.2, 0.2, 1.0]);
 
-	//Melde Listener an
-	window.addEventListener('keydown', TastenAktion);
-	window.addEventListener('mousemove', MausAktion);
 	// 8. Render
-	render();
+	gameLoop();
 };
 
 function render()
@@ -618,88 +646,71 @@ function render()
 		object.Render();
 	});
 
-	    // Set view matrix
-		viewMatrix = mat4.create();
-		mat4.lookAt(viewMatrix, eye, target, up);
-	
-		// 7 Save uniform location and save the view matrix into it
-		viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
-		gl.uniformMatrix4fv(viewMatrixLoc, false, viewMatrix);
-
-	requestAnimationFrame(render);
 }
 
-
-
-function MausAktion(e) {
+function update()
+{
+	let look = [(target[0] - eye[0]) * speed,
+				(target[1] - eye[1]) * speed,
+				(target[2] - eye[2]) * speed];
 	
-	//horizontal
-	perspectiveHAngle = (180 + e.x*0.5) % 360;
+	/* 
+	 *	Using gl-matrix:
+		let look = vec3.create();
+		vec3.sub(look, target, eye);
+		vec3.scale(look, look, speed);
+	*/
 
-	target[0]=eye[0] + Math.cos(degToRad(perspectiveHAngle));
-	target[2]=eye[2] + Math.sin(degToRad(perspectiveHAngle));
-
-	//vertikal
-	let v = (e.y-260)/260*45;
-	if(v < -44){
-		perspectiveVAngle=-44;
-	}else{
-		if(v > 44){
-			perspectiveVAngle = 44;
-		}
-		else{
-			perspectiveVAngle = v;
-		}
+	if(keyPressed.KeyW) {
+		eye[0] += look[0];
+		eye[2] += look[2];
+		target[0] += look[0];
+		target[2] += look[2];
 	}
-
-	if(perspectiveVAngle == 0){
-		target[1] = eye[1];
-	}else{
-	target[1]=eye[1]+(Math.sin(degToRad(-perspectiveVAngle))*(Math.cos(degToRad(perspectiveHAngle)))/(Math.cos(degToRad(-perspectiveHAngle))));
+	if(keyPressed.KeyS) {
+		eye[0] -= look[0];
+		eye[2] -= look[2];
+		target[0] -= look[0];
+		target[2] -= look[2];
 	}
-
-
-}
-function localEyeAndTarget(winkel){
-	let localEyeX =  eye[0] + 0.01*Math.cos(degToRad(perspectiveHAngle+winkel));
-	let localTargetX	= target[0] + 0.01*Math.cos(degToRad(perspectiveHAngle+winkel));
-	if((localEyeX < 0.5) && (localEyeX > -0.5)){
-		target[0] = localTargetX;
-		eye[0] = localEyeX;
-		
+	if(keyPressed.KeyA) {
+		eye[0] += look[2];
+		eye[2] -= look[0];
+		target[0] += look[2];
+		target[2] -= look[0];
 	}
-	
-	let localEyeZ = eye[2] + 0.01*Math.sin(degToRad(perspectiveHAngle+winkel));
-	let localTargetZ =target[2] + 0.01*Math.sin(degToRad(perspectiveHAngle+winkel));
-	if ((localEyeZ < 0.5) && (localEyeZ > -0.5)){
-	target[2] = localTargetZ;
-	eye[2] =localEyeZ;
+	if(keyPressed.KeyD) {
+		eye[0] -= look[2];
+		eye[2] += look[0];
+		target[0] -= look[2];
+		target[2] += look[0];
 	}
+	mat4.lookAt(viewMatrix, eye, target, up);
 
-}
-function TastenAktion(e) {
-    let key = e.key;
-    switch(key){
-		case 'a' : 
-		localEyeAndTarget(-90);
-        break
-
-		case 's' : 
-		localEyeAndTarget(-180);
-        break
-
-		case 'w' : 
-		localEyeAndTarget(0);
-		break
-		
-		case 'd' : 
-		localEyeAndTarget(90);		
-		break
-
-
-	}
-
+	// Set view matrix
 	gl.uniformMatrix4fv(viewMatrixLoc, false, viewMatrix);
-	
 }
+function gameLoop() 
+{
+	update();
+	render();
+	requestAnimationFrame(gameLoop);
+}
+
+function keydown(e) 
+{
+	keyPressed[e.code] = true;
+}
+
+function keyup(e) 
+{
+	keyPressed[e.code] = false;
+}
+
+function changeView(e)
+{
+	vec3.rotateY(target, target, eye, -e.movementX * speed);
+	mat4.lookAt(viewMatrix, eye, target, up);
+}
+
 init ();
