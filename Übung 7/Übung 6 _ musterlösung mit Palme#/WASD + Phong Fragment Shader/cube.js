@@ -560,7 +560,7 @@ function init() {
 	gl.uniformMatrix4fv(projectionMatrixLoc, false, projectionMatrix);
 
 	// TODO: Setze hier die Lichteigenschaften I als Uniform-Variablen
-	gl.uniform3fv(lightPositionLoc, [0.5, -0.9, 0.5]);  //Licht vorne Links!
+	gl.uniform3fv(lightPositionLoc, [0.5, -0.5, 0.5]);  //Licht vorne Links!
 	gl.uniform4fv(IaLoc, [0.3, 0.3, 0.3, 1.0]);
 	gl.uniform4fv(IdLoc, [0.8, 0.8, 0.8, 1.0]);
 	gl.uniform4fv(IsLoc, [0.2, 0.2, 0.2, 1.0]);
@@ -588,9 +588,9 @@ function init() {
 	*/
 
 	
-	//Himmel
-	let Himmel = new Cube({x: -1.0, y: -1.0, z: -1.0},{x: 1.0, y: 1.0, z: 1.0}, {r:0.529,g: 0.808,b: 0.922,a: 1.0}, {r:0.0, g:0.0, b:0.0, a:1.0}, {r:0.0, g:0.0, b:0.0, a:1.0});
-	objects.push(Himmel);
+	//Troposphäre
+	let Troposphäre = new Cube({x: -1.0, y: -1.0, z: -1.0},{x: 1.0, y: 1.0, z: 1.0}, {r:0.529,g: 0.808,b: 0.922,a: 1.0}, {r:0.0, g:0.0, b:0.0, a:1.0}, {r:0.0, g:0.0, b:0.0, a:1.0});
+	objects.push(Troposphäre);
 	
 	//Ozean
 	let Ozean = new Cube({x: -1.0, y: -0.99, z: -1.0},{x: 1, y: -0.98, z: 1.0}, {r:0.0, g:1.0, b:1.0, a:1.0}, {r:0.0, g:0.8, b:0.8, a:1.0}, {r:0.0, g:0.6, b:0.6, a:1.0});	//rumspielen!
@@ -629,10 +629,10 @@ function init() {
 	
 
 	//Palmenblätter
-	let Palmenblatt1 = new Cube({x: -0.04, y: -0.705, z: -0.2},{x: 0.04, y: -0.715, z: 0.2}, {r:0.0, g:0.8 ,b:0.0, a:1.0}, {r:0.0, g:0.3, b:0.0, a:1.0}, {r:0.0, g:0.1, b:0.0, a:1.0});
+	let Palmenblatt1 = new Cube({x: -0.04, y: -0.715, z: -0.2},{x: 0.04, y: -0.705, z: 0.2}, {r:0.0, g:0.8 ,b:0.0, a:1.0}, {r:0.0, g:0.9, b:0.0, a:1.0}, {r:0.0, g:0.1, b:0.0, a:1.0});
 	objects.push(Palmenblatt1);
 
-	let Palmenblatt2 = new Cube({x: -0.2, y: -0.705, z: -0.04},{x: 0.2, y: -0.715, z: 0.04}, {r:0.0, g:0.8 ,b:0.0, a:1.0}, {r:0.0, g:0.3,b:0.0, a:1.0}, {r:0.0, g:0.1, b:0.0, a:1.0});
+	let Palmenblatt2 = new Cube({x: -0.2, y: -0.715, z: -0.04},{x: 0.2, y: -0.705, z: 0.04}, {r:0.0, g:0.8 ,b:0.0, a:1.0}, {r:0.0, g:0.9,b:0.0, a:1.0}, {r:0.0, g:0.1, b:0.0, a:1.0});
 	objects.push(Palmenblatt2);
 
 	
