@@ -68,6 +68,7 @@ class Pyramidenstumpf {
 			this.orientation = {x: 0, y: 0, z: 0};
 			this.position = {x: 0.0, y: 0.0, z: 0.0};
 			this.verticesVBO = gl.createBuffer();
+			this.modelMatrix;
 			this.SetModelMatrix(this.position, this.orientation);
 			this.normalMatrix;
 			this.ka = vec4.fromValues(0.218, 0.1084, 0.030, 1.0);
@@ -542,7 +543,7 @@ function init() {
 	objects.push(Ozean);
 
 	//Strand
-	let Strand = new Cube({x: -0.5, y: -0.98, z: -0.5},{x: 0.5, y: -0.97, z: 0.5}, {ka: [1.0, 1.0, 0.0, 1.0], kd: [0.5, 0.5, 0.0, 1.0], ks: [0.6, 0.6, 0.0, 1.0]}); //rumspielen!
+	let Strand = new Cube({x: -0.5, y: -0.98, z: -0.5},{x: 0.5, y: -0.97, z: 0.5}, {ka: [1.0, 1.0, 0.0, 1.0], kd: [0.8, 0.8, 0.0, 1.0], ks: [0.0, 0.0, 0.0, 1.0]}); //rumspielen!
 	objects.push(Strand);
 	
 	
@@ -568,6 +569,10 @@ function init() {
 	let Palmenstamm7 = new Pyramidenstumpf({x: -0.04, y: -0.75, z: -0.04},{x: 0.04, y: -0.71, z: 0.04});
 	objects.push(Palmenstamm7);
 	
+	
+	let Testii = new Pyramidenstumpf({x: -0.04, y: -0.75, z: -0.04},{x: 0.04, y: -0.71, z: 0.04});
+	Testii.SetModelMatrix({x: 0.5, y: -0.7, z: 0.4},{x: 0.0, y: 0.0, z: 0.0});
+	objects.push(Testii);
 
 	//Palmenblätter
 	let Palmenblatt1 = new Cube({x: -0.04, y: -0.715, z: -0.2},{x: 0.04, y: -0.705, z: 0.2}, {ka: [0.0, 0.2 ,0.0, 1.0], kd: [0.0, 0.3, 0.0, 1.0], ks: [0.0, 0.0, 0.0, 1.0]});
@@ -586,7 +591,7 @@ function init() {
 
 	//Setze hier die Lichteigenschaften I als Uniform-Variablen
 	lightPositionLoc = gl.getUniformLocation(program, "lightPosition");
-	gl.uniform3f(lightPositionLoc, 0.5, -0.5, 0.5); // Ecke vorne Links mit (0.0,-0.8,0.0)
+	gl.uniform3f(lightPositionLoc, 0.5, -0.5, 0.0); // Ecke vorne Links mit (0.0,-0.8,0.0)
 
 	IaLoc = gl.getUniformLocation(program, "Ia");
 	gl.uniform4f(IaLoc, 0.3, 0.3, 0.3, 1.0);
