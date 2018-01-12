@@ -72,7 +72,7 @@ class Pyramidenstumpf {
 			this.normalMatrix;
 			this.ka = vec4.fromValues(0.218, 0.1084, 0.030, 1.0);
 			this.kd = vec4.fromValues(0.545, 0.271, 0.075, 1.0);
-			this.ks = vec4.fromValues(0.545, 0.271, 0.075, 1.0);
+			this.ks = vec4.fromValues(0.0, 0.0, 0.0, 1.0);
 	
 			this.MakeModel();
 			this.InitBuffer();
@@ -165,9 +165,9 @@ class Pyramidenstumpf {
 			0.0, -0.3, 1.0,
 			0.0, -0.3, 1.0,
 
-			0.0, -0.3, -1.0,
-			0.0, -0.3, -1.0,
-			0.0, -0.3, -1.0,
+			0.0, -0.3, 1.0,
+			0.0, -0.3, 1.0,
+			0.0, -0.3, 1.0,
 
 			//Left
 			-1.0, -0.3, 0.0,
@@ -570,10 +570,10 @@ function init() {
 	
 
 	//Palmenblätter
-	let Palmenblatt1 = new Cube({x: -0.04, y: -0.71, z: -0.2},{x: 0.04, y: -0.715, z: 0.2}, {ka: [0.0, 0.2 ,0.0, 1.0], kd: [0.0, 0.3, 0.0, 1.0], ks: [0.0, 0.1,0.0, 1.0]});
+	let Palmenblatt1 = new Cube({x: -0.04, y: -0.715, z: -0.2},{x: 0.04, y: -0.705, z: 0.2}, {ka: [0.0, 0.2 ,0.0, 1.0], kd: [0.0, 0.3, 0.0, 1.0], ks: [0.0, 0.0, 0.0, 1.0]});
 	objects.push(Palmenblatt1);
 
-	let Palmenblatt2 = new Cube(from = {x: -0.2, y: -0.71, z: -0.04}, to = {x: 0.2, y: -0.715, z: 0.04}, {ka: [0.0, 0.2 ,0.0, 1.0], kd: [0.0, 0.3,0.0, 1.0], ks: [0.0, 0.1, 0.0, 1.0]});
+	let Palmenblatt2 = new Cube(from = {x: -0.2, y: -0.715, z: -0.04}, to = {x: 0.2, y: -0.705, z: 0.04}, {ka: [0.0, 0.2 ,0.0, 1.0], kd: [0.0, 0.3,0.0, 1.0], ks: [0.0, 0.0, 0.0, 1.0]});
 	objects.push(Palmenblatt2);
 
 
@@ -586,16 +586,16 @@ function init() {
 
 	//Setze hier die Lichteigenschaften I als Uniform-Variablen
 	lightPositionLoc = gl.getUniformLocation(program, "lightPosition");
-	gl.uniform3f(lightPositionLoc, 0.0, -0.80, 0.0); // Ecke vorne Links mit (0.0,-0.8,0.0)
+	gl.uniform3f(lightPositionLoc, 0.5, -0.5, 0.5); // Ecke vorne Links mit (0.0,-0.8,0.0)
 
 	IaLoc = gl.getUniformLocation(program, "Ia");
-	gl.uniform4f(IaLoc, 0.5, 0.5, 0.5, 1.0);
-
-	IsLoc = gl.getUniformLocation(program, "Is");
-	gl.uniform4f(IsLoc, 1.0, 1.0, 1.0, 1.0);
+	gl.uniform4f(IaLoc, 0.3, 0.3, 0.3, 1.0);
 
 	IdLoc = gl.getUniformLocation(program, "Id");
-	gl.uniform4f(IdLoc, 0.2, 0.2, 0.2, 1.0);
+	gl.uniform4f(IdLoc, 0.8, 0.8, 0.8, 1.0);
+
+	IsLoc = gl.getUniformLocation(program, "Is");
+	gl.uniform4f(IsLoc, 0.2, 0.2, 0.2, 1.0);
 
 	//Melde Listener an
 	window.addEventListener('keydown', TastenAktion);
