@@ -25,76 +25,62 @@
 			uniform mat4 modelMatrix;
 			uniform mat4 viewMatrix;
 			uniform mat4 projectionMatrix;
+
 			uniform mat4 normalMatrix;
+			uniform vec3 lightPosition;
 
-			// Erhalte hier die Lichtposition
-			uniform vec4 lightPosition;
-
-			// Speichere alle übergebenen Koeffizienten als Uniform-Variablen
-			uniform vec3 Ia;
-			uniform vec3 Id;
-			uniform vec3 Is;
-
-			uniform vec3 ka;
-			uniform vec3 kd;
-			uniform vec3 ks;
-
-			// Setze alle Konstanten c_1, c_2, c_3, n als const ein
-			const float c_1 = 0.0;
-			const float c_2 = 0.0;
-			const float c_3 = 0.002;
-			const float n	  = 3.0;
-			
-			// calculated color using the Phong illumination model
-
-			varying vec4 fColor;
-			varying vec3 fColorBerechnung;
-			
-
-			
+			varying vec4 position;
+			varying vec4 lightPos;
+			varying vec4 normal;
 
 			void main()
 			{
-				float d;
-				float f_att;
-
 				// Rechne alle übergebenen Koordinaten (Lichtposition, Normalen) in das Kamerakoordinatensystem um
-				vec3 pos = (projectionMatrix * vPosition).xyz;
-				vec3 lightpos = (projectionMatrix * lightPosition).xyz;
+				normal = normalMatrix * vec4(vNormal, 0.0);
+				lightPos = viewMatrix * vec4(lightPosition, 1.0);
+				
+				mat4 modelViewMatrix = viewMatrix * modelMatrix;
+				position = viewMatrix * vPosition;
 
-				// Berechne und normiere die Vektoren L, N, R und V. 
-				// Denke daran, dass du für die Normierung nur die Koordinaten x, y und z berücksichtigst.
-				vec3 L = normalize(lightpos - pos);
-				vec3 N = normalize(vNormal);
-				vec3 R = reflect(pos, N); 				
-				vec3 V = -normalize(pos);			   
-			
-				// Berechne die Koeffizienten d, sowie f_{att}
-				d = length(lightpos - pos);
-				f_att = min(1.0/(c_1+c_2*d+c_3*d*d),1.0);
-
-				// Berechne die Farbe mit der Phong-Beleuchtungsgleichung
-				fColorBerechnung = Ia * ka + f_att * (Id * kd * max(0.0,dot(N,L)) + Is * ks * pow(max(0.0, dot(R,V)),n)); //Intensitäten, ist auch noch nicht ganz richtig.. !!
-				fColor.r = fColorBerechnung.r;
-				fColor.g = fColorBerechnung.g;
-				fColor.b = fColorBerechnung.b; 
-				fColor.a = 1.0;
-
-				//clamping
-				clamp(fColor, 0.0, 1.0);
-
-			
-				gl_Position = projectionMatrix * viewMatrix * modelMatrix * vPosition;
+				gl_Position = projectionMatrix * position;
 			}
 		</script>
 		<script id="fragment-shader" type="x-shader/x-fragment">
 			precision mediump float;
 			
-			varying vec4 fColor;
+			// Speichere alle übergebenen Koeffizienten als Uniform-Variablen
+			uniform vec4 Ia; 
+			uniform vec4 Id; 
+			uniform vec4 Is; 
+			uniform vec4 ka; 
+			uniform vec4 kd; 
+			uniform vec4 ks;
+
+			// Setze alle Konstanten c_1, c_2, c_3, n als const ein
+			const float c_1 = 1.0;
+			const float c_2 = 0.0005;
+			const float c_3 = 0.000003;
+			const float n	  = 3.0;
 			
+			varying vec4 position;
+			varying vec4 lightPos; // TODO: Speichere die vom Shader übergebene Lichtposition
+			varying vec4 normal;
+
 			void main()
-			{					
-				gl_FragColor = fColor;
+			{	
+				// Berechne und normiere die Vektoren L, N, R und V. 
+				// Denke daran, dass du für die Normierung nur die Koordinaten x, y und z berücksichtigst.
+				vec3 N = normalize(normal.xyz);
+				vec3 L = normalize((lightPos - position).xyz);
+				vec3 V = normalize((-position).xyz);	
+				vec3 R = reflect(-L, N); 				
+
+				// Berechne die Koeffizienten d, sowie f_{att}
+				float d = length(lightPos - position);
+				float f_att = min(1.0/(c_1+c_2*d+c_3*d*d),1.0);
+		   
+							
+				gl_FragColor = Ia * ka + f_att * (Id * kd * max(0.0,dot(N,L)) + Is * ks * pow(max(0.0, dot(R,V)),n));
 			}
 		</script>
 

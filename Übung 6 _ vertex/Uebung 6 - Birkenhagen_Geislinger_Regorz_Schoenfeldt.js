@@ -70,9 +70,9 @@ class Pyramidenstumpf {
 			this.verticesVBO = gl.createBuffer();
 			this.SetModelMatrix(this.position, this.orientation);
 			this.normalMatrix;
-			this.ka = vec3.fromValues(0.218, 0.1084, 0.030);
-			this.kd = vec3.fromValues(0.545, 0.271, 0.075);
-			this.ks = vec3.fromValues(0.545, 0.271, 0.075);
+			this.ka = vec4.fromValues(0.218, 0.1084, 0.030, 1.0);
+			this.kd = vec4.fromValues(0.545, 0.271, 0.075, 1.0);
+			this.ks = vec4.fromValues(0.545, 0.271, 0.075, 1.0);
 	
 			this.MakeModel();
 			this.InitBuffer();
@@ -250,9 +250,9 @@ class Pyramidenstumpf {
 			gl.uniformMatrix4fv(normalMatrixLoc, false, new Float32Array(this.normalMatrix));
 
 			//Übergebe hier die Materialkoeffizienten des Objektes an den Shader
-			gl.uniform3f(kaLoc, this.ka[0], this.ka[1], this.ka[2]);
-			gl.uniform3f(ksLoc, this.ks[0], this.ks[1], this.ks[2]);
-			gl.uniform3f(kdLoc, this.kd[0], this.kd[1], this.kd[2]);
+			gl.uniform4f(kaLoc, this.ka[0], this.ka[1], this.ka[2], this.ka[3]);
+			gl.uniform4f(ksLoc, this.ks[0], this.ks[1], this.ks[2], this.ks[3]);
+			gl.uniform4f(kdLoc, this.kd[0], this.kd[1], this.kd[2], this.kd[3]);
 			
 		}
 	
@@ -279,7 +279,7 @@ class Pyramidenstumpf {
 
 class Cube {
 	constructor (from = {x: 0.0, y: 0.0, z: 0.0}, to = {x: 0.0, y: 0.0, z: 0.0}, 
-		Colors = {ka: [1, 1, 0], kd: [1, 1, 0], ks: [1, 1, 0]}) {
+		Colors = {ka: [1, 1, 0, 1], kd: [1, 1, 0, 1], ks: [1, 1, 0, 1]}) {
 		this.from = from;
 		this.to = to;
 		this.mesh = [];
@@ -290,9 +290,9 @@ class Cube {
 		this.modelMatrix;
 		this.SetModelMatrix(this.position, this.orientation);
 		this.normalMatrix;
-		this.ka = vec3.fromValues(Colors.ka[0],Colors.ka[1],Colors.ka[2]);
-		this.kd = vec3.fromValues(Colors.kd[0],Colors.kd[1],Colors.kd[2]);
-		this.ks = vec3.fromValues(Colors.ks[0],Colors.ks[1],Colors.ks[2]);
+		this.ka = vec4.fromValues(Colors.ka[0],Colors.ka[1],Colors.ka[2],Colors.ka[3]);
+		this.kd = vec4.fromValues(Colors.kd[0],Colors.kd[1],Colors.kd[2],Colors.kd[3]);
+		this.ks = vec4.fromValues(Colors.ks[0],Colors.ks[1],Colors.ks[2],Colors.ks[3]);
 
 		this.MakeModel();
 		this.InitBuffer();
@@ -459,9 +459,9 @@ class Cube {
 		gl.uniformMatrix4fv(normalMatrixLoc, false, new Float32Array(this.normalMatrix));
 
 		//Übergebe hier die Materialkoeffizienten des Objektes an den Shader
-		gl.uniform3f(kaLoc, this.ka[0], this.ka[1], this.ka[2]);
-		gl.uniform3f(ksLoc, this.ks[0], this.ks[1], this.ks[2]);
-		gl.uniform3f(kdLoc, this.kd[0], this.kd[1], this.kd[2]);
+		gl.uniform4f(kaLoc, this.ka[0], this.ka[1], this.ka[2], this.ka[3]);
+		gl.uniform4f(ksLoc, this.ks[0], this.ks[1], this.ks[2], this.ks[3]);
+		gl.uniform4f(kdLoc, this.kd[0], this.kd[1], this.kd[2], this.kd[3]);
 				
 	
 	}
@@ -534,15 +534,15 @@ function init() {
 	// 3. Specify vertices
 	
 	//Himmel
-	let Himmel = new Cube({x: -1.0, y: -1.0, z: -1.0},{x: 1.0, y: 1.0, z: 1.0}, {ka: [0.529, 0.808, 0.922], kd: [0.0, 0.0, 0.0], ks: [0.0, 0.0, 0.0]});
+	let Himmel = new Cube({x: -1.0, y: -1.0, z: -1.0},{x: 1.0, y: 1.0, z: 1.0}, {ka: [0.529, 0.808, 0.922, 1.0], kd: [0.0, 0.0, 0.0, 1.0], ks: [0.0, 0.0, 0.0, 1.0]});
 	objects.push(Himmel);
 	
 	//Ozean
-	let Ozean = new Cube({x: -1.0, y: -0.99, z: -1.0},{x: 1, y: -0.98, z: 1.0}, {ka: [0.0, 1.0, 1.0], kd: [0.0, 0.8, 0.8], ks: [0.0, 0.6, 0.6]});	//rumspielen!
+	let Ozean = new Cube({x: -1.0, y: -0.99, z: -1.0},{x: 1, y: -0.98, z: 1.0}, {ka: [0.0, 1.0, 1.0, 1.0], kd: [0.0, 0.8, 0.8, 1.0], ks: [0.0, 0.6, 0.6, 1.0]});	//rumspielen!
 	objects.push(Ozean);
 
 	//Strand
-	let Strand = new Cube({x: -0.5, y: -0.98, z: -0.5},{x: 0.5, y: -0.97, z: 0.5}, {ka: [1.0, 1.0, 0.0], kd: [0.5, 0.5, 0.0], ks: [0.6, 0.6, 0.0]}); //rumspielen!
+	let Strand = new Cube({x: -0.5, y: -0.98, z: -0.5},{x: 0.5, y: -0.97, z: 0.5}, {ka: [1.0, 1.0, 0.0, 1.0], kd: [0.5, 0.5, 0.0, 1.0], ks: [0.6, 0.6, 0.0, 1.0]}); //rumspielen!
 	objects.push(Strand);
 	
 	
@@ -570,10 +570,10 @@ function init() {
 	
 
 	//Palmenblätter
-	let Palmenblatt1 = new Cube({x: -0.04, y: -0.71, z: -0.2},{x: 0.04, y: -0.715, z: 0.2}, {ka: [0.0, 0.2 ,0.0], kd: [0.0, 0.3, 0.0], ks: [0.0, 0.1,0.0]});
+	let Palmenblatt1 = new Cube({x: -0.04, y: -0.71, z: -0.2},{x: 0.04, y: -0.715, z: 0.2}, {ka: [0.0, 0.2 ,0.0, 1.0], kd: [0.0, 0.3, 0.0, 1.0], ks: [0.0, 0.1,0.0, 1.0]});
 	objects.push(Palmenblatt1);
 
-	let Palmenblatt2 = new Cube(from = {x: -0.2, y: -0.71, z: -0.04}, to = {x: 0.2, y: -0.715, z: 0.04}, {ka: [0.0, 0.2 ,0.0], kd: [0.0, 0.3,0.0], ks: [0.0, 0.1, 0.0]});
+	let Palmenblatt2 = new Cube(from = {x: -0.2, y: -0.71, z: -0.04}, to = {x: 0.2, y: -0.715, z: 0.04}, {ka: [0.0, 0.2 ,0.0, 1.0], kd: [0.0, 0.3,0.0, 1.0], ks: [0.0, 0.1, 0.0, 1.0]});
 	objects.push(Palmenblatt2);
 
 
@@ -586,16 +586,16 @@ function init() {
 
 	//Setze hier die Lichteigenschaften I als Uniform-Variablen
 	lightPositionLoc = gl.getUniformLocation(program, "lightPosition");
-	gl.uniform4f(lightPositionLoc, 0.0, -0.80, 0.0, 0.0); // Ecke vorne Links mit (0.0,-0.8,0.0)
+	gl.uniform3f(lightPositionLoc, 0.0, -0.80, 0.0); // Ecke vorne Links mit (0.0,-0.8,0.0)
 
 	IaLoc = gl.getUniformLocation(program, "Ia");
-	gl.uniform3f(IaLoc, 0.5, 0.5, 0.5);
+	gl.uniform4f(IaLoc, 0.5, 0.5, 0.5, 1.0);
 
 	IsLoc = gl.getUniformLocation(program, "Is");
-	gl.uniform3f(IsLoc, 1.0, 1.0, 1.0);
+	gl.uniform4f(IsLoc, 1.0, 1.0, 1.0, 1.0);
 
 	IdLoc = gl.getUniformLocation(program, "Id");
-	gl.uniform3f(IdLoc, 0.2, 0.2, 0.2);
+	gl.uniform4f(IdLoc, 0.2, 0.2, 0.2, 1.0);
 
 	//Melde Listener an
 	window.addEventListener('keydown', TastenAktion);
