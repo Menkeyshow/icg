@@ -532,9 +532,15 @@ function init() {
 	specularExponentLoc = gl.getUniformLocation(program, "n");
 	
 
-    // Set view matrix
+	// Set view matrix
+	/*
 	eye = vec3.fromValues(0.0, -0.75, 0.48);
-	target = vec3.fromValues(0.0, 0.0, 0.47);
+	target = vec3.fromValues(0.0, 0.0, 0.47); //unsere alten Werte
+	up = vec3.fromValues(0.0, 1.0, 0.0);
+	*/
+
+	eye = vec3.fromValues(0.0, -0.75, -0.5);
+	target = vec3.fromValues(0.0, -0.75, 0.0); //unsere neuen Werte
 	up = vec3.fromValues(0.0, 1.0, 0.0);
 
 	viewMatrix = mat4.create();
@@ -548,9 +554,9 @@ function init() {
 	gl.uniformMatrix4fv(projectionMatrixLoc, false, projectionMatrix);
 
 	// TODO: Setze hier die Lichteigenschaften I als Uniform-Variablen
-	gl.uniform3fv(lightPositionLoc, [0.0, -0.80, 0.0]);
+	gl.uniform3fv(lightPositionLoc, [0.5, -0.5, 0.5]);  //Licht vorne Links!
 	gl.uniform4fv(IaLoc, [0.3, 0.3, 0.3, 1.0]);
-	gl.uniform4fv(IdLoc, [0.5, 0.5, 0.5, 1.0]);
+	gl.uniform4fv(IdLoc, [0.8, 0.8, 0.8, 1.0]);
 	gl.uniform4fv(IsLoc, [0.2, 0.2, 0.2, 1.0]);
 	
 	document.addEventListener("keydown", keydown);
@@ -561,6 +567,7 @@ function init() {
 	}
 
 	// Specify vertices
+	
 	/*
 	let cube1 = new Cube({x: -2, y: -1, z: -2}, {x: 2, y: -0.5, z: 2}, {r: 0.3, g: 0.0, b: 0.0, a: 1.0}, {r: 0.5, g: 0.0, b: 0.0, a: 1.0}, {r: 1.0, g: 1.0, b: 1.0, a: 1.0});
 	objects.push(cube1);
@@ -574,6 +581,7 @@ function init() {
 	objects.push(cube3);
 	*/
 
+	
 	//Himmel
 	let Himmel = new Cube({x: -1.0, y: -1.0, z: -1.0},{x: 1.0, y: 1.0, z: 1.0}, {r:0.529,g: 0.808,b: 0.922,a: 1.0}, {r:0.0, g:0.0, b:0.0, a:1.0}, {r:0.0, g:0.0, b:0.0, a:1.0});
 	objects.push(Himmel);
@@ -611,11 +619,13 @@ function init() {
 	
 
 	//Palmenblätter
-	let Palmenblatt1 = new Cube({x: -0.04, y: -0.71, z: -0.2},{x: 0.04, y: -0.715, z: 0.2}, {r:0.0, g:0.2 ,b:0.0, a:1.0}, {r:0.0, g:0.3, b:0.0, a:1.0}, {r:0.0, g:0.1, b:0.0, a:1.0});
+	let Palmenblatt1 = new Cube({x: -0.04, y: -0.705, z: -0.2},{x: 0.04, y: -0.715, z: 0.2}, {r:0.0, g:0.2 ,b:0.0, a:1.0}, {r:0.0, g:0.3, b:0.0, a:1.0}, {r:0.0, g:0.1, b:0.0, a:1.0});
 	objects.push(Palmenblatt1);
 
-	let Palmenblatt2 = new Cube({x: -0.2, y: -0.71, z: -0.04},{x: 0.2, y: -0.715, z: 0.04}, {r:0.0, g:0.2 ,b:0.0, a:1.0}, {r:0.0, g:0.3,b:0.0, a:1.0}, {r:0.0, g:0.1, b:0.0, a:1.0});
+	let Palmenblatt2 = new Cube({x: -0.2, y: -0.705, z: -0.04},{x: 0.2, y: -0.715, z: 0.04}, {r:0.0, g:0.2 ,b:0.0, a:1.0}, {r:0.0, g:0.3,b:0.0, a:1.0}, {r:0.0, g:0.1, b:0.0, a:1.0});
 	objects.push(Palmenblatt2);
+
+	
 
 	// Render
 	gameLoop();
