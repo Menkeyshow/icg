@@ -55,12 +55,13 @@
 			uniform vec4 ka; 
 			uniform vec4 kd; 
 			uniform vec4 ks;
+			uniform float n;
 
 			// Setze alle Konstanten c_1, c_2, c_3, n als const ein
 			const float c_1 = 1.0;
 			const float c_2 = 0.0005;
 			const float c_3 = 0.000003;
-			const float n	  = 3.0;
+
 			
 			varying vec4 position;
 			varying vec4 lightPos; // TODO: Speichere die vom Shader übergebene Lichtposition

@@ -78,7 +78,8 @@ class Pyramidenstumpf {
 			this.ka = vec4.fromValues(0.218, 0.1084, 0.030, 1.0);
 			this.kd = vec4.fromValues(0.545, 0.271, 0.075, 1.0);
 			this.ks = vec4.fromValues(0.0, 0.0, 0.0, 1.0);
-	
+			this.specularExponent = 4.0;
+
 			this.SetModelMatrix(this.position, this.orientation);
 			this.MakeModel();
 			this.InitBuffer();
@@ -310,7 +311,7 @@ class Cube {
 		this.ka = vec4.fromValues(Colors.ka[0],Colors.ka[1],Colors.ka[2],Colors.ka[3]);
 		this.kd = vec4.fromValues(Colors.kd[0],Colors.kd[1],Colors.kd[2],Colors.kd[3]);
 		this.ks = vec4.fromValues(Colors.ks[0],Colors.ks[1],Colors.ks[2],Colors.ks[3]);
-
+		this.specularExponent = 4.0;
 		this.SetModelMatrix(this.position, this.orientation);
 		this.MakeModel();
 		this.InitBuffer();
@@ -490,7 +491,7 @@ class Cube {
 		gl.uniform4f(kaLoc, this.ka[0], this.ka[1], this.ka[2], this.ka[3]);
 		gl.uniform4f(ksLoc, this.ks[0], this.ks[1], this.ks[2], this.ks[3]);
 		gl.uniform4f(kdLoc, this.kd[0], this.kd[1], this.kd[2], this.kd[3]);
-				
+		gl.uniform1f(specularExponentLoc, this.specularExponent);	
 	
 	}
 
@@ -542,7 +543,13 @@ function init() {
 	normalsLoc = gl.getAttribLocation(program, "vNormal"); //statt color
 	normalMatrixLoc = gl.getUniformLocation(program, "normalMatrix");
 	lightPositionLoc = gl.getUniformLocation(program, "lightPosition");
-	
+	IaLoc = gl.getUniformLocation(program, "Ia");
+	IdLoc = gl.getUniformLocation(program, "Id");
+	IsLoc = gl.getUniformLocation(program, "Is");
+	kaLoc = gl.getUniformLocation(program, "ka");
+	kdLoc = gl.getUniformLocation(program, "kd");
+	ksLoc = gl.getUniformLocation(program, "ks");
+	specularExponentLoc = gl.getUniformLocation(program, "n");
     // Set view matrix
 	eye = vec3.fromValues(0.0, -0.75, 0.48);
 	target = vec3.fromValues(0.0, -0.75, 0.0);
@@ -557,8 +564,11 @@ function init() {
 	// 7 Save uniform location and save the view matrix into it
 	gl.uniformMatrix4fv(viewMatrixLoc, false, viewMatrix);
 
-    gl.uniform3fv(lightPositionLoc, [0.5, -0.5, 0.5]); // Ecke vorne Links mit (0.0,-0.8,0.0)
-	
+    gl.uniform3fv(lightPositionLoc, [-0.5, -0.5, -0.5]); // Ecke vorne Links mit (0.0,-0.8,0.0)
+	gl.uniform4fv (IaLoc, [0.3, 0.3, 0.3, 1.0]);
+	gl.uniform4fv(IdLoc, [0.8, 0.8, 0.8, 1.0]);
+	gl.uniform4fv(IsLoc, [0.2, 0.2, 0.2, 1.0]);
+
 	document.addEventListener("keydown", keydown);
 	document.addEventListener("keyup", keyup);
 	document.addEventListener("mousemove", changeView);
@@ -582,7 +592,6 @@ function init() {
 	let Strand = new Cube({x: -0.5, y: -0.98, z: -0.5},{x: 0.5, y: -0.97, z: 0.5}, {ka: [1.0, 1.0, 0.0, 1.0], kd: [0.8, 0.8, 0.0, 1.0], ks: [0.0, 0.0, 0.0, 1.0]}); //rumspielen!
 	objects.push(Strand);
 	
-	
 	//Palmenstamm
 	let Palmenstamm1 = new Pyramidenstumpf({x: -0.04, y: -0.99, z: -0.04},{x: 0.04, y: -0.95, z: 0.04});
 	objects.push(Palmenstamm1);
@@ -605,34 +614,16 @@ function init() {
 	let Palmenstamm7 = new Pyramidenstumpf({x: -0.04, y: -0.75, z: -0.04},{x: 0.04, y: -0.71, z: 0.04});
 	objects.push(Palmenstamm7);
 	
-	
 	let Testii = new Pyramidenstumpf({x: -0.04, y: -0.75, z: -0.04},{x: 0.04, y: -0.71, z: 0.04});
 	Testii.SetModelMatrix({x: 0.5, y: -0.7, z: 0.4},{x: 0.0, y: 0.0, z: 0.0});
 	objects.push(Testii);
 
 	//Palmenblätter
-	let Palmenblatt1 = new Cube({x: -0.04, y: -0.715, z: -0.2},{x: 0.04, y: -0.705, z: 0.2}, {ka: [0.0, 0.2 ,0.0, 1.0], kd: [0.0, 0.3, 0.0, 1.0], ks: [0.0, 0.0, 0.0, 1.0]});
+	let Palmenblatt1 = new Cube({x: -0.04, y: -0.715, z: -0.2},{x: 0.04, y: -0.705, z: 0.2}, {ka: [0.0, 0.2 ,0.0, 1.0], kd: [0.0, 0.8 , 0.0, 1.0], ks: [0.0, 0.0, 0.0, 1.0]});
 	objects.push(Palmenblatt1);
 
-	let Palmenblatt2 = new Cube(from = {x: -0.2, y: -0.715, z: -0.04}, to = {x: 0.2, y: -0.705, z: 0.04}, {ka: [0.0, 0.2 ,0.0, 1.0], kd: [0.0, 0.3,0.0, 1.0], ks: [0.0, 0.0, 0.0, 1.0]});
+	let Palmenblatt2 = new Cube(from = {x: -0.2, y: -0.715, z: -0.04}, to = {x: 0.2, y: -0.705, z: 0.04}, {ka: [0.0, 0.2 ,0.0, 1.0], kd: [0.0, 0.8 ,0.0, 1.0], ks: [0.0, 0.0, 0.0, 1.0]});
 	objects.push(Palmenblatt2);
-
-
-	
-	kaLoc = gl.getUniformLocation(program, "ka");
-	kdLoc = gl.getUniformLocation(program, "kd");
-	ksLoc = gl.getUniformLocation(program, "ks");
-
-	//Setze hier die Lichteigenschaften I als Uniform-Variablen
-	
-	IaLoc = gl.getUniformLocation(program, "Ia");
-	gl.uniform4fv (IaLoc, [0.3, 0.3, 0.3, 1.0]);
-
-	IdLoc = gl.getUniformLocation(program, "Id");
-	gl.uniform4fv(IdLoc, [0.8, 0.8, 0.8, 1.0]);
-
-	IsLoc = gl.getUniformLocation(program, "Is");
-	gl.uniform4fv(IsLoc, [0.2, 0.2, 0.2, 1.0]);
 
 	// 8. Render
 	gameLoop();
