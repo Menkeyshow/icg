@@ -355,17 +355,15 @@ class Pyramidenstumpf {
 		// TODO: Setzt die Normalen - ähnlich zu den Positionen 
 		// (Merke: eine Normale zeigt die Richtung, nicht die Position)
 		this.normals = [
+			//Back
+		0.0, -0.3, 1.0,
+		0.0, -0.3, 1.0,
+		0.0, -0.3, 1.0,
 
-		//Front
-			
-		0.0, -0.3, -1.0,
-		0.0, -0.3, -1.0,
-		0.0, -0.3, -1.0,
-
-		0.0, -0.3, -1.0,
-		0.0, -0.3, -1.0,
-		0.0, -0.3, -1.0,
-		
+		0.0, -0.3, 1.0,
+		0.0, -0.3, 1.0,
+		0.0, -0.3, 1.0,
+	
 		//Right
 		1.0, -0.3, 0.0,
 		1.0, -0.3, 0.0,
@@ -375,14 +373,17 @@ class Pyramidenstumpf {
 		1.0, -0.3, 0.0,
 		1.0, -0.3, 0.0,
 
-		//Back
-		0.0, -0.3, 1.0,
-		0.0, -0.3, 1.0,
-		0.0, -0.3, 1.0,
-
-		0.0, -0.3, 1.0,
-		0.0, -0.3, 1.0,
-		0.0, -0.3, 1.0,
+			//Front
+			
+			0.0, -0.3, -1.0,
+			0.0, -0.3, -1.0,
+			0.0, -0.3, -1.0,
+	
+			0.0, -0.3, -1.0,
+			0.0, -0.3, -1.0,
+			0.0, -0.3, -1.0,
+			
+		
 
 		//Left
 		-1.0, -0.3, 0.0,
@@ -598,6 +599,7 @@ function init() {
 	
 	
 	//Palmenstamm
+	
 	let Palmenstamm1 = new Pyramidenstumpf({x: -0.04, y: -0.99, z: -0.04},{x: 0.04, y: -0.95, z: 0.04});
 	objects.push(Palmenstamm1);
 	
@@ -618,11 +620,12 @@ function init() {
 
 	let Palmenstamm7 = new Pyramidenstumpf({x: -0.04, y: -0.75, z: -0.04},{x: 0.04, y: -0.71, z: 0.04});
 	objects.push(Palmenstamm7);
-
-	let TestStamm = new Pyramidenstumpf({x: -0.1, y: -0.90, z: -0.1},{x:0.1,y:-0.80,z:0.1})
-	TestStamm.SetPositionAndOrientation({x: 0.7, y: 0.3, z:0.5}); //zum Testen diesen Block ein wenig hin und her schieben!
-	objects.push(TestStamm);
 	
+	/*
+	let TestStamm = new Pyramidenstumpf({x: -0.04, y: -0.90, z: -0.04},{x:0.04,y:-0.80,z:0.04})
+	TestStamm.SetPositionAndOrientation({x: -0.0, y: 0.3, z:0.0}); //zum Testen diesen Block ein wenig hin und her schieben!
+	objects.push(TestStamm);
+	*/
 
 	//Palmenblätter
 	let Palmenblatt1 = new Cube({x: -0.04, y: -0.715, z: -0.2},{x: 0.04, y: -0.705, z: 0.2}, {r:0.0, g:0.8 ,b:0.0, a:1.0}, {r:0.0, g:0.9, b:0.0, a:1.0}, {r:0.0, g:0.1, b:0.0, a:1.0});
