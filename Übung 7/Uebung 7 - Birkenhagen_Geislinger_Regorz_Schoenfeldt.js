@@ -22,21 +22,21 @@ let objects = [];
 // Shader variables
 let program;
 
-let pointLoc;
-//let colorLoc;
-let normalsLoc;
+let pointLoc,
+	normalsLoc,
+	texCoordLoc;
+
+let modelMatrixLoc,
+	modelMatrix;
 
 let lightPositionLoc,
 	lightPosition,
 	IaLoc,
 	IdLoc,
-	IsLoc;
-let kaLoc;
-let kdLoc;
-let ksLoc;
-
-let modelMatrixLoc,
-	modelMatrix;
+	IsLoc,
+	kaLoc,
+	kdLoc,
+	ksLoc;
 
 let	normalMatrixLoc,
 	normalMatrix;
@@ -53,7 +53,12 @@ let projectionMatrixLoc,
 		KeyS: false,
 		KeyD: false
 	};
-	
+
+let sandTexture,
+	sandNormalTexture;
+let diffuseMapLoc,
+	normalMapLoc;
+
 	const speed = 0.02;
 
 let perspectiveHAngle = 270;
@@ -303,6 +308,7 @@ class Cube {
 		this.to = to;
 		this.mesh;
 		this.normals;
+		this.textureCoordinates;
 		this.orientation = {x: 0, y: 0, z: 0};
 		this.position = {x: 0, y: 0, z: 0};
 		this.verticesVBO = gl.createBuffer();
@@ -433,6 +439,61 @@ class Cube {
 			0.0,  1.0,  0.0			
 
 		];
+		this.textureCoordinates = [
+			// Front
+			1.0, 0.0,
+			0.0, 0.0,
+			1.0, 1.0,
+
+			0.0, 1.0,
+			1.0, 1.0,
+			0.0, 0.0,
+
+			// Right
+			1.0, 1.0,
+			1.0, 0.0,
+			0.0, 0.0,
+
+			0.0, 1.0,
+			1.0, 1.0,
+			0.0, 0.0,
+
+			// Back
+			0.0, 0.0,
+			1.0, 0.0,
+			0.0, 1.0,
+
+			1.0, 1.0,
+			0.0, 1.0,
+			1.0, 0.0,
+
+			// Left
+			0.0, 1.0,
+			0.0, 0.0,
+			1.0, 0.0,
+
+			1.0, 1.0,
+			0.0, 1.0,
+			1.0, 0.0,
+
+			// Bottom
+			0.0, 1.0,
+			0.0, 0.0,
+			1.0, 1.0,
+
+			1.0, 0.0,
+			0.0, 0.0,
+			1.0, 1.0,
+
+			// Top
+			0.0, 1.0,
+			0.0, 0.0,
+			1.0, 1.0,
+
+			1.0, 0.0,
+			0.0, 0.0,
+			1.0, 1.0
+		];
 	}
 
 	/**
@@ -457,9 +518,6 @@ class Cube {
 		mat4.rotate(this.modelMatrix, this.modelMatrix, orientation.z, [0, 0, 1]);
 
 		//Set the normalmatrix 
-		//(Erstelle hier die Normalenmatrix und speichere sie in die Variable this.normalMatrix
-		//       Errechne dafür zunächst die modelMatrix im Weltkoordinatensystem, indem du sie mit der
-		//       viewMatrix multiplizierst. Erzeuge dann die transponierte, inverse Normalenmatrix)
 		let modelViewMatrix = mat4.create();
 		mat4.multiply(modelViewMatrix, viewMatrix, this.modelMatrix);
 		this.normalMatrix = mat4.create();
@@ -474,9 +532,7 @@ class Cube {
 		gl.useProgram(program);
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesVBO);
 
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.mesh.concat(this.normals)), gl.STATIC_DRAW);
-		gl.uniformMatrix4fv(modelMatrixLoc, false, new Float32Array(this.modelMatrix));		
-		gl.uniformMatrix4fv(normalMatrixLoc, false, new Float32Array(this.normalMatrix));	
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.mesh.concat(this.normals.concat(this.textureCoordinates))), gl.STATIC_DRAW);
 	}
 
 	/**
@@ -503,8 +559,10 @@ class Cube {
 		// Set attribute pointers and enable them
 		gl.vertexAttribPointer(pointLoc, 3, gl.FLOAT, false, 0, 0);
 		gl.vertexAttribPointer(normalsLoc, 3, gl.FLOAT, false, 0, this.mesh.length*4);
+		gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 0, (this.mesh.length + this.normals.length)*4);
 		gl.enableVertexAttribArray(pointLoc);
 		gl.enableVertexAttribArray(normalsLoc);
+		gl.enableVertexAttribArray(texCoordLoc);
 
 		// Set uniforms
 		this.UpdateBuffer();
@@ -513,8 +571,28 @@ class Cube {
 		gl.drawArrays(gl.TRIANGLES, 0, this.mesh.length/3);
 	}
 }
-
-/**
+function initTextures() {
+    sandTexture = gl.createTexture();
+    sandImage = new Image();
+    sandImage.onload = function () { handleTextureLoaded(sandImage, sandTexture); }
+	sandImage.src = "sand_diffuse.jpg";
+}
+function initNormals() {
+	sandNormalTexture = gl.createTexture();
+	sandNormalImage = new Image();
+	sandNormalImage.onload = function () { handleTextureLoaded(sandNormalImage, sandNormalTexture); }
+	sandNormalImage.src = "sand_normal.jpg";
+	    // TODO: Erstelle analog zu diffuser Textur eine Normal Map für den Sand. - müsste laufen ^^
+}
+function handleTextureLoaded(image, texture) {
+	gl.bindTexture(gl.TEXTURE_2D, texture);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+	gl.generateMipmap(gl.TEXTURE_2D);
+	gl.bindTexture(gl.TEXTURE_2D, null);
+}
+		/**
  * Initializes the program, models and shaders
  */
 function init() {
@@ -534,14 +612,14 @@ function init() {
 
 	// 7 Save attribute location to address them
 	pointLoc = gl.getAttribLocation(program, "vPosition");
+	normalsLoc = gl.getAttribLocation(program, "vNormal");
+	texCoordLoc = gl.getAttribLocation(program, "vTexCoord");
 	modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
+	normalMatrixLoc = gl.getUniformLocation(program, "normalMatrix");
 	
 	viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
 	projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 	
-	//Hier die Speicherlocations der Normalenmatrix, der Materialkoeffizienten und der Lichtintensitäten in die globalen Variablen speichern
-	normalsLoc = gl.getAttribLocation(program, "vNormal"); //statt color
-	normalMatrixLoc = gl.getUniformLocation(program, "normalMatrix");
 	lightPositionLoc = gl.getUniformLocation(program, "lightPosition");
 	IaLoc = gl.getUniformLocation(program, "Ia");
 	IdLoc = gl.getUniformLocation(program, "Id");
@@ -549,8 +627,12 @@ function init() {
 	kaLoc = gl.getUniformLocation(program, "ka");
 	kdLoc = gl.getUniformLocation(program, "kd");
 	ksLoc = gl.getUniformLocation(program, "ks");
-	specularExponentLoc = gl.getUniformLocation(program, "n");
-    // Set view matrix
+	specularExponentLoc = gl.getUniformLocation(program, "specExp");
+	
+	diffuseMapLoc = gl.getUniformLocation(program, "diffuseMap");
+	normalMapLoc = gl.getUniformLocation(program, "normalMap");
+
+	// Set view matrix
 	eye = vec3.fromValues(0.0, -0.75, 0.48);
 	target = vec3.fromValues(0.0, -0.75, 0.0);
 	up = vec3.fromValues(0.0, 1.0, 0.0);
@@ -561,11 +643,14 @@ function init() {
 	projectionMatrix = mat4.create();
 	mat4.perspective(projectionMatrix, Math.PI * 0.4, canvas.width / canvas.height, 0.1, 100);
 
-	// 7 Save uniform location and save the view matrix into it
-	gl.uniformMatrix4fv(viewMatrixLoc, false, viewMatrix);
+	// Initialize textures
+	initTextures();
+	initNormals();
 
+	gl.uniformMatrix4fv(projectionMatrixLoc, false, projectionMatrix);
+	
     gl.uniform3fv(lightPositionLoc, [-0.5, -0.5, -0.5]); // Ecke vorne Links mit (0.0,-0.8,0.0)
-	gl.uniform4fv (IaLoc, [0.3, 0.3, 0.3, 1.0]);
+	gl.uniform4fv(IaLoc, [0.3, 0.3, 0.3, 1.0]);
 	gl.uniform4fv(IdLoc, [0.8, 0.8, 0.8, 1.0]);
 	gl.uniform4fv(IsLoc, [0.2, 0.2, 0.2, 1.0]);
 
@@ -575,8 +660,6 @@ function init() {
 	canvas.onmousedown = function() {
         canvas.requestPointerLock();
 	}
-	// 7 Save uniform location and save the projection matrix into it
-	gl.uniformMatrix4fv(projectionMatrixLoc, false, projectionMatrix);
 	
 	// 3. Specify vertices
 	
@@ -632,6 +715,12 @@ function init() {
 function render()
 {
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+	// Connect diffuse map to the shader
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, sandTexture);
+	gl.uniform1i(diffuseMapLoc, 0);
+	// TODO: Verknüpfe Normal Map analog zu diffuser Map mit Shader.
 
 	// Call every render function
     objects.forEach(function(object) {
