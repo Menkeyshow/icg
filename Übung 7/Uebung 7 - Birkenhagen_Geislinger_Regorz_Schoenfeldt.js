@@ -211,8 +211,6 @@ class Pyramidenstumpf {
 
 		];
 			
-
-
 		}
 	
 		/**
@@ -321,6 +319,7 @@ class Cube {
 		this.SetModelMatrix(this.position, this.orientation);
 		this.MakeModel();
 		this.InitBuffer();
+		
 	}
 
 	/**
@@ -509,7 +508,6 @@ class Cube {
 
 		orientation = {x: degToRad(orientation.x), y: degToRad(orientation.y), z: degToRad(orientation.z)};
 
-	
 		// Set the transformation matrix
 		this.modelMatrix = mat4.create();
 		mat4.translate(this.modelMatrix, this.modelMatrix, [position.x, position.y, position.z]);
@@ -531,7 +529,6 @@ class Cube {
 	InitBuffer () {
 		gl.useProgram(program);
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesVBO);
-
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.mesh.concat(this.normals.concat(this.textureCoordinates))), gl.STATIC_DRAW);
 	}
 
@@ -548,7 +545,7 @@ class Cube {
 		gl.uniform4f(ksLoc, this.ks[0], this.ks[1], this.ks[2], this.ks[3]);
 		gl.uniform4f(kdLoc, this.kd[0], this.kd[1], this.kd[2], this.kd[3]);
 		gl.uniform1f(specularExponentLoc, this.specularExponent);	
-	
+
 	}
 
 	Render () {
@@ -563,7 +560,7 @@ class Cube {
 		gl.enableVertexAttribArray(pointLoc);
 		gl.enableVertexAttribArray(normalsLoc);
 		gl.enableVertexAttribArray(texCoordLoc);
-
+		
 		// Set uniforms
 		this.UpdateBuffer();
 
@@ -582,7 +579,7 @@ function initNormals() {
 	sandNormalImage = new Image();
 	sandNormalImage.onload = function () { handleTextureLoaded(sandNormalImage, sandNormalTexture); }
 	sandNormalImage.src = "sand_normal.jpg";
-	    // TODO: Erstelle analog zu diffuser Textur eine Normal Map für den Sand. - müsste laufen ^^
+	    // Erstelle analog zu diffuser Textur eine Normal Map für den Sand. - müsste laufen ^^
 }
 function handleTextureLoaded(image, texture) {
 	gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -712,6 +709,7 @@ function init() {
 	gameLoop();
 };
 
+
 function render()
 {
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -720,8 +718,10 @@ function render()
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, sandTexture);
 	gl.uniform1i(diffuseMapLoc, 0);
-	// TODO: Verknüpfe Normal Map analog zu diffuser Map mit Shader.
-
+	// Verknüpfe Normal Map analog zu diffuser Map mit Shader.
+	gl.activeTexture(gl.TEXTURE1);
+	gl.bindTexture(gl.TEXTURE_2D, sandNormalTexture);
+	gl.uniform1i(normalMapLoc, 0);
 	// Call every render function
     objects.forEach(function(object) {
 		object.Render();
