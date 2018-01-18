@@ -41,7 +41,7 @@
 				lightPos = viewMatrix * vec4(lightPosition, 1);
 				position = viewMatrix * modelMatrix * vPosition;
 				
-				fNormal = vec4(vNormal, 0.0);
+				fNormal = vec4(vNormal, 0.0); //WIEDER ZU 1.0 MACHEN!
 				
 				fTexCoord = vTexCoord;
 
@@ -119,6 +119,7 @@
 				
 				//alter Code, Christian hat gemeint, das evtl der gesetzte Alphakanal Probleme bereitet; aber das Ergebnis is dasselbe.
 				//gl_FragColor =  Ia * ka + f_att * (Id * diffuseColor * max(dot(N, L), 0.0) + Is * ks * pow(max(dot(R, V), 0.0), specExp));
+				
 				gl_FragColor =  vec4((Ia * ka + f_att * (Id * diffuseColor * max(dot(N, L), 0.0) + Is * ks * pow(max(dot(R, V), 0.0), specExp))).rgb,1.0);
 
 			}
