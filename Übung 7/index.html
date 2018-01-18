@@ -62,9 +62,10 @@
 			uniform mat4 normalMatrix;
 
 			uniform sampler2D diffuseMap;
-			uniform sampler2D normalMap;
-			//Füge Normal Map als uniforme Variable hinzu.
 			
+			//Füge Normal Map als uniforme Variable hinzu.
+			uniform sampler2D normalMap;
+
 			const float c_1 = 1.0;
 			const float c_2 = 0.0005;
 			const float c_3 = 0.000003;
@@ -79,6 +80,7 @@
 
 			void main()
 			{	
+				//Berechnung der TBN-Matrix
 				vec3 t1 = cross(fNormal.xyz, vec3(0.0, 0.0, 1.0));
 				vec3 t2 = cross(fNormal.xyz, vec3(0.0, 1.0, 0.0));
 				if (length(t1) > length(t2)) {
@@ -91,25 +93,33 @@
 				vec3 b = cross(n, t);
 
 				mat3 tbn = mat3(t,b,n);
-				// Berechne und normiere die Vektoren L, N, R und V. 
-				//vec3 N = normalize((normalMatrix * fNormal).xyz);
+				
+				//Umrechnen der Normalmap in Normalen
 				vec3 normalMapf = texture2D(normalMap, fTexCoord).xyz * 2.0 - 1.0;
-				vec3 N = tbn * normalMapf;
+				vec3 N = normalize(tbn * normalMapf);
 
+				// Berechne und normiere die Vektoren L, R und V. 
 				vec3 L = normalize((lightPos - position).xyz);
 				vec3 V = normalize((-position).xyz);	
 				vec3 R = reflect(-L, N); 				
 
 				// Berechne die Koeffizienten d, sowie f_{att}
-				float d = length(lightPos - position);
+				float d = length(lightPos - position); // besser mit distance berechnen, sollte aber so gehen
 
 				float f_att = min(1.0/(c_1 + c_2 * d + c_3 * d * d),1.0);
 		   
+				//Festlegen des diffusen Anteils mitHilfe der Textur
 				vec4 diffuseColor = texture2D(diffuseMap, fTexCoord);
 							
-				//L = L * transpose(tbn, tbn);
-				//V = V * transpose(tbn, tbn);
-				gl_FragColor =  Ia * ka + f_att * (Id * diffuseColor * max(dot(N, L), 0.0) + Is * ks * pow(max(dot(R, V), 0.0), specExp));
+
+				//Testen ob gewisse Funktionen funktionieren! Dafür aber auch fNormal = vec4(vNormal, 1.0); im VertexShader setzen (momentan Z.44)
+				//gl_FragColor = normalize(fNormal); //Normalen Test
+                //gl_FragColor = normalize(lightPos);//Licht Test
+				//gl_FragColor = diffuseColor;		 //Textur Test 
+				
+				//alter Code, Christian hat gemeint, das evtl der gesetzte Alphakanal Probleme bereitet; aber das Ergebnis is dasselbe.
+				//gl_FragColor =  Ia * ka + f_att * (Id * diffuseColor * max(dot(N, L), 0.0) + Is * ks * pow(max(dot(R, V), 0.0), specExp));
+				gl_FragColor =  vec4((Ia * ka + f_att * (Id * diffuseColor * max(dot(N, L), 0.0) + Is * ks * pow(max(dot(R, V), 0.0), specExp))).rgb,1.0);
 
 			}
 		</script>
