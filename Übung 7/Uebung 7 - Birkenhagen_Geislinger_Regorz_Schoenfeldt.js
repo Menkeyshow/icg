@@ -36,7 +36,8 @@ let lightPositionLoc,
 	IsLoc,
 	kaLoc,
 	kdLoc,
-	ksLoc;
+	ksLoc,
+	isTexturedLoc;
 
 let	normalMatrixLoc,
 	normalMatrix;
@@ -70,7 +71,7 @@ function degToRad (deg) {
 }
 
 class Pyramidenstumpf {
-		constructor (from = {x: -0.5, y: -0.0, z: -0.5}, to = {x: 0.5, y: 0.5, z: 0.5}) {
+		constructor (from = {x: -0.5, y: -0.0, z: -0.5}, to = {x: 0.5, y: 0.5, z: 0.5}, isTextured = 0) {
 			this.from = from;
 			this.to = to;
 			this.mesh;
@@ -84,6 +85,7 @@ class Pyramidenstumpf {
 			this.kd = vec4.fromValues(0.545, 0.271, 0.075, 1.0);
 			this.ks = vec4.fromValues(0.0, 0.0, 0.0, 1.0);
 			this.specularExponent = 4.0;
+			this.isTextured = isTextured;
 
 			this.SetModelMatrix(this.position, this.orientation);
 			this.MakeModel();
@@ -275,6 +277,8 @@ class Pyramidenstumpf {
 			gl.uniform4f(kaLoc, this.ka[0], this.ka[1], this.ka[2], this.ka[3]);
 			gl.uniform4f(ksLoc, this.ks[0], this.ks[1], this.ks[2], this.ks[3]);
 			gl.uniform4f(kdLoc, this.kd[0], this.kd[1], this.kd[2], this.kd[3]);
+
+			gl.uniform1i(isTexturedLoc, this.isTextured);
 			
 		}
 	
@@ -301,7 +305,7 @@ class Pyramidenstumpf {
 
 class Cube {
 	constructor (from = {x: 0.0, y: 0.0, z: 0.0}, to = {x: 0.0, y: 0.0, z: 0.0}, 
-		Colors = {ka: [1, 1, 0, 1], kd: [1, 1, 0, 1], ks: [1, 1, 0, 1]}) {
+		Colors = {ka: [1, 1, 0, 1], kd: [1, 1, 0, 1], ks: [1, 1, 0, 1]}, isTextured = 0) {
 		this.from = from;
 		this.to = to;
 		this.mesh;
@@ -316,6 +320,7 @@ class Cube {
 		this.kd = vec4.fromValues(Colors.kd[0],Colors.kd[1],Colors.kd[2],Colors.kd[3]);
 		this.ks = vec4.fromValues(Colors.ks[0],Colors.ks[1],Colors.ks[2],Colors.ks[3]);
 		this.specularExponent = 4.0;
+		this.isTextured = isTextured;
 		this.SetModelMatrix(this.position, this.orientation);
 		this.MakeModel();
 		this.InitBuffer();
@@ -380,37 +385,37 @@ class Cube {
 			this.to.x, this.to.y, this.from.z,
 			this.from.x, this.to.y, this.from.z,
 			this.to.x, this.to.y, this.to.z
-		];
+		]
 
 		this.normals = [
-			//Front
-			0.0, 0.0, -1.0,
-			0.0, 0.0, -1.0,
-			0.0, 0.0, -1.0,
+			// Front
+			0.0, 0.0, 1.0,
+			0.0, 0.0, 1.0,
+			0.0, 0.0, 1.0,
 
-			0.0, 0.0, -1.0,
-			0.0, 0.0, -1.0,
-			0.0, 0.0, -1.0,
+			0.0, 0.0, 1.0,
+			0.0, 0.0, 1.0,
+			0.0, 0.0, 1.0,
+
+			// Right
+			1.0, 0.0, 0.0,
+			1.0, 0.0, 0.0,
+			1.0, 0.0, 0.0,
 			
-			//Right
 			1.0, 0.0, 0.0,
 			1.0, 0.0, 0.0,
 			1.0, 0.0, 0.0,
 
-			1.0, 0.0, 0.0,
-			1.0, 0.0, 0.0,
-			1.0, 0.0, 0.0,
+			// Back
+			0.0, 0.0, -1.0,
+			0.0, 0.0, -1.0,
+			0.0, 0.0, -1.0,
 
-			//Back
-			0.0, 0.0, 1.0,
-			0.0, 0.0, 1.0,
-			0.0, 0.0, 1.0,
+			0.0, 0.0, -1.0,
+			0.0, 0.0, -1.0,
+			0.0, 0.0, -1.0,
 
-			0.0, 0.0, 1.0,
-			0.0, 0.0, 1.0,
-			0.0, 0.0, 1.0,
-
-			//Left
+			// Left
 			-1.0, 0.0, 0.0,
 			-1.0, 0.0, 0.0,
 			-1.0, 0.0, 0.0,
@@ -419,24 +424,23 @@ class Cube {
 			-1.0, 0.0, 0.0,
 			-1.0, 0.0, 0.0,
 
-			//Top
-			0.0,  1.0,  0.0,
-			0.0,  1.0,  0.0,
-			0.0,  1.0,  0.0,	//evtl falsch
-			 
-			0.0,  1.0,  0.0,
-			0.0,  1.0,  0.0,
-			0.0,  1.0,  0.0,
+			// Bottom
+			0.0, -1.0, 0.0,
+			0.0, -1.0, 0.0,
+			0.0, -1.0, 0.0,
 
-			//Bottom
-			0.0, -1.0,  0.0,
-			0.0, -1.0,  0.0,
-			0.0, -1.0,  0.0,	//evtl falsch
+			0.0, -1.0, 0.0,
+			0.0, -1.0, 0.0,
+			0.0, -1.0, 0.0,
 
-			0.0, -1.0,  0.0,
-			0.0, -1.0,  0.0,
-			0.0, -1.0,  0.0
+			// Top
+			0.0, 1.0, 0.0,
+			0.0, 1.0, 0.0,
+			0.0, 1.0, 0.0,
 
+			0.0, 1.0, 0.0,
+			0.0, 1.0, 0.0,
+			0.0, 1.0, 0.0
 		];
 		this.textureCoordinates = [
 			// Front
@@ -545,6 +549,7 @@ class Cube {
 		gl.uniform4f(ksLoc, this.ks[0], this.ks[1], this.ks[2], this.ks[3]);
 		gl.uniform4f(kdLoc, this.kd[0], this.kd[1], this.kd[2], this.kd[3]);
 		gl.uniform1f(specularExponentLoc, this.specularExponent);	
+		gl.uniform1i(isTexturedLoc, this.isTextured);
 
 	}
 
@@ -613,7 +618,8 @@ function init() {
 	texCoordLoc = gl.getAttribLocation(program, "vTexCoord");
 	modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
 	normalMatrixLoc = gl.getUniformLocation(program, "normalMatrix");
-	
+	isTexturedLoc = gl.getUniformLocation(program, "isTextured");
+
 	viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
 	projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 	
@@ -646,10 +652,10 @@ function init() {
 
 	gl.uniformMatrix4fv(projectionMatrixLoc, false, projectionMatrix);
 	
-    gl.uniform3fv(lightPositionLoc, [-0.5, -0.5, -0.5]); // Ecke vorne Links mit (0.0,-0.8,0.0)
-	gl.uniform4fv(IaLoc, [0.3, 0.3, 0.3, 1.0]);
+    gl.uniform3fv(lightPositionLoc, [-0.5, -0.5, -0.5]);
+	gl.uniform4fv(IaLoc, [0.1, 0.1, 0.1, 1.0]);
 	gl.uniform4fv(IdLoc, [0.8, 0.8, 0.8, 1.0]);
-	gl.uniform4fv(IsLoc, [0.2, 0.2, 0.2, 1.0]);
+	gl.uniform4fv(IsLoc, [0.0, 0.0, 0.0, 1.0]);
 
 	document.addEventListener("keydown", keydown);
 	document.addEventListener("keyup", keyup);
@@ -669,7 +675,7 @@ function init() {
 	objects.push(Ozean);
 
 	//Strand
-	let Strand = new Cube({x: -0.5, y: -0.98, z: -0.5},{x: 0.5, y: -0.97, z: 0.5}, {ka: [1.0, 1.0, 0.0, 1.0], kd: [0.8, 0.8, 0.0, 1.0], ks: [0.0, 0.0, 0.0, 1.0]}); //rumspielen!
+	let Strand = new Cube({x: -0.5, y: -0.98, z: -0.5},{x: 0.5, y: -0.97, z: 0.5}, {ka: [1.0, 1.0, 0.0, 1.0], kd: [0.8, 0.8, 0.0, 1.0], ks: [0.0, 0.0, 0.0, 1.0]}, isTextured = 1); //rumspielen!
 	objects.push(Strand);
 	
 	//Palmenstamm
