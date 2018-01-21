@@ -71,7 +71,8 @@ function degToRad (deg) {
 }
 
 class Pyramidenstumpf {
-		constructor (from = {x: -0.5, y: -0.0, z: -0.5}, to = {x: 0.5, y: 0.5, z: 0.5}, isTextured = 0) {
+		constructor (from = {x: -0.5, y: -0.0, z: -0.5}, to = {x: 0.5, y: 0.5, z: 0.5}, 
+			isTextured = 0) {
 			this.from = from;
 			this.to = to;
 			this.mesh;
@@ -277,7 +278,7 @@ class Pyramidenstumpf {
 			gl.uniform4f(kaLoc, this.ka[0], this.ka[1], this.ka[2], this.ka[3]);
 			gl.uniform4f(ksLoc, this.ks[0], this.ks[1], this.ks[2], this.ks[3]);
 			gl.uniform4f(kdLoc, this.kd[0], this.kd[1], this.kd[2], this.kd[3]);
-
+			gl.uniform1f(specularExponentLoc, this.specularExponent);	
 			gl.uniform1i(isTexturedLoc, this.isTextured);
 			
 		}
@@ -305,7 +306,8 @@ class Pyramidenstumpf {
 
 class Cube {
 	constructor (from = {x: 0.0, y: 0.0, z: 0.0}, to = {x: 0.0, y: 0.0, z: 0.0}, 
-		Colors = {ka: [1, 1, 0, 1], kd: [1, 1, 0, 1], ks: [1, 1, 0, 1]}, isTextured = 0) {
+		Colors = {ka: [1.0, 1.0, 0.0, 1.0], kd: [1.0, 1.0, 0.0, 1], 
+			ks: [1.0, 1.0, 0.0, 1.0]}, isTextured = 0) {
 		this.from = from;
 		this.to = to;
 		this.mesh;
@@ -321,6 +323,7 @@ class Cube {
 		this.ks = vec4.fromValues(Colors.ks[0],Colors.ks[1],Colors.ks[2],Colors.ks[3]);
 		this.specularExponent = 4.0;
 		this.isTextured = isTextured;
+
 		this.SetModelMatrix(this.position, this.orientation);
 		this.MakeModel();
 		this.InitBuffer();
@@ -533,7 +536,10 @@ class Cube {
 	InitBuffer () {
 		gl.useProgram(program);
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesVBO);
+
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.mesh.concat(this.normals.concat(this.textureCoordinates))), gl.STATIC_DRAW);
+		gl.uniformMatrix4fv(modelMatrixLoc, false, new Float32Array(this.modelMatrix));		
+		gl.uniformMatrix4fv(normalMatrixLoc, false, new Float32Array(this.normalMatrix));	
 	}
 
 	/**
@@ -543,6 +549,285 @@ class Cube {
 		// Push the matrix to the buffer
 		gl.uniformMatrix4fv(modelMatrixLoc, false, new Float32Array(this.modelMatrix));	
 		gl.uniformMatrix4fv(normalMatrixLoc, false, new Float32Array(this.normalMatrix));
+
+		this.SetModelMatrix();
+
+		//Übergebe hier die Materialkoeffizienten des Objektes an den Shader
+		gl.uniform4f(kaLoc, this.ka[0], this.ka[1], this.ka[2], this.ka[3]);
+		gl.uniform4f(ksLoc, this.ks[0], this.ks[1], this.ks[2], this.ks[3]);
+		gl.uniform4f(kdLoc, this.kd[0], this.kd[1], this.kd[2], this.kd[3]);
+		gl.uniform1f(specularExponentLoc, this.specularExponent);	
+		gl.uniform1i(isTexturedLoc, this.isTextured);
+
+	}
+
+	Render () {
+		
+		// Bind the program and the vertex buffer object
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesVBO);
+
+		// Set attribute pointers and enable them
+		gl.vertexAttribPointer(pointLoc, 3, gl.FLOAT, false, 0, 0);
+		gl.vertexAttribPointer(normalsLoc, 3, gl.FLOAT, false, 0, this.mesh.length*4);
+		gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 0, (this.mesh.length + this.normals.length)*4);
+		gl.enableVertexAttribArray(pointLoc);
+		gl.enableVertexAttribArray(normalsLoc);
+		gl.enableVertexAttribArray(texCoordLoc);
+		
+		// Set uniforms
+		this.UpdateBuffer();
+
+		// Draw the object
+		gl.drawArrays(gl.TRIANGLES, 0, this.mesh.length/3);
+	}
+}
+class HimmelCube {
+	constructor (from = {x: 0.0, y: 0.0, z: 0.0}, to = {x: 0.0, y: 0.0, z: 0.0}, 
+		Colors = {ka: [1.0, 1.0, 0.0, 1.0], kd: [1.0, 1.0, 0.0, 1], 
+			ks: [1.0, 1.0, 0.0, 1.0]}, isTextured = 0) {
+		this.from = from;
+		this.to = to;
+		this.mesh;
+		this.normals;
+		this.textureCoordinates;
+		this.orientation = {x: 0, y: 0, z: 0};
+		this.position = {x: 0, y: 0, z: 0};
+		this.verticesVBO = gl.createBuffer();
+		this.modelMatrix;
+		this.normalMatrix;
+		this.ka = vec4.fromValues(Colors.ka[0],Colors.ka[1],Colors.ka[2],Colors.ka[3]);
+		this.kd = vec4.fromValues(Colors.kd[0],Colors.kd[1],Colors.kd[2],Colors.kd[3]);
+		this.ks = vec4.fromValues(Colors.ks[0],Colors.ks[1],Colors.ks[2],Colors.ks[3]);
+		this.specularExponent = 4.0;
+		this.isTextured = isTextured;
+
+		this.SetModelMatrix(this.position, this.orientation);
+		this.MakeModel();
+		this.InitBuffer();
+		
+	}
+
+	/**
+	 * Makes the model, namely the mesh and the colors arrays
+	 */
+	MakeModel () {
+		this.mesh = [
+			// Front
+			this.from.x, this.from.y, this.to.z,
+			this.to.x, this.from.y, this.to.z,
+			this.from.x, this.to.y, this.to.z,
+
+			this.to.x, this.to.y, this.to.z,
+			this.from.x, this.to.y, this.to.z,
+			this.to.x, this.from.y, this.to.z,
+
+			// Right
+			this.to.x, this.to.y, this.to.z,
+			this.to.x, this.from.y, this.to.z,
+			this.to.x, this.from.y, this.from.z,
+
+			this.to.x, this.to.y, this.from.z,
+			this.to.x, this.to.y, this.to.z,
+			this.to.x, this.from.y, this.from.z,
+
+			// Back
+			this.from.x, this.from.y, this.from.z,
+			this.to.x, this.from.y, this.from.z,
+			this.from.x, this.to.y, this.from.z,
+
+			this.to.x, this.to.y, this.from.z,
+			this.from.x, this.to.y, this.from.z,
+			this.to.x, this.from.y, this.from.z,
+
+			// Left
+			this.from.x, this.to.y, this.to.z,
+			this.from.x, this.from.y, this.to.z,
+			this.from.x, this.from.y, this.from.z,
+
+			this.from.x, this.to.y, this.from.z,
+			this.from.x, this.to.y, this.to.z,
+			this.from.x, this.from.y, this.from.z,
+
+			// Bottom
+			this.from.x, this.from.y, this.to.z,
+			this.from.x, this.from.y, this.from.z,
+			this.to.x, this.from.y, this.to.z,
+
+			this.to.x, this.from.y, this.from.z,
+			this.from.x, this.from.y, this.from.z,
+			this.to.x, this.from.y, this.to.z,
+
+			// Top
+			this.from.x, this.to.y, this.to.z,
+			this.from.x, this.to.y, this.from.z,
+			this.to.x, this.to.y, this.to.z,
+
+			this.to.x, this.to.y, this.from.z,
+			this.from.x, this.to.y, this.from.z,
+			this.to.x, this.to.y, this.to.z
+		]
+
+		this.normals = [
+			// Front
+			0.0, 0.0, -1.0,
+			0.0, 0.0, -1.0,
+			0.0, 0.0, -1.0,
+
+			0.0, 0.0, -1.0,
+			0.0, 0.0, -1.0,
+			0.0, 0.0, -1.0,
+
+			// Right
+			-1.0, 0.0, 0.0,
+			-1.0, 0.0, 0.0,
+			-1.0, 0.0, 0.0,
+			
+			-1.0, 0.0, 0.0,
+			-1.0, 0.0, 0.0,
+			-1.0, 0.0, 0.0,
+
+			// Back
+			0.0, 0.0, 1.0,
+			0.0, 0.0, 1.0,
+			0.0, 0.0, 1.0,
+
+			0.0, 0.0, 1.0,
+			0.0, 0.0, 1.0,
+			0.0, 0.0, 1.0,
+
+			// Left
+			1.0, 0.0, 0.0,
+			1.0, 0.0, 0.0,
+			1.0, 0.0, 0.0,
+
+			1.0, 0.0, 0.0,
+			1.0, 0.0, 0.0,
+			1.0, 0.0, 0.0,
+
+			// Bottom
+			0.0, 1.0, 0.0,
+			0.0, 1.0, 0.0,
+			0.0, 1.0, 0.0,
+
+			0.0, 1.0, 0.0,
+			0.0, 1.0, 0.0,
+			0.0, 1.0, 0.0,
+
+			// Top
+			0.0, -1.0, 0.0,
+			0.0, -1.0, 0.0,
+			0.0, -1.0, 0.0,
+
+			0.0, -1.0, 0.0,
+			0.0, -1.0, 0.0,
+			0.0, -1.0, 0.0
+		];
+		this.textureCoordinates = [
+			// Front
+			1.0, 0.0,
+			0.0, 0.0,
+			1.0, 1.0,
+
+			0.0, 1.0,
+			1.0, 1.0,
+			0.0, 0.0,
+
+			// Right
+			1.0, 1.0,
+			1.0, 0.0,
+			0.0, 0.0,
+
+			0.0, 1.0,
+			1.0, 1.0,
+			0.0, 0.0,
+
+			// Back
+			0.0, 0.0,
+			1.0, 0.0,
+			0.0, 1.0,
+
+			1.0, 1.0,
+			0.0, 1.0,
+			1.0, 0.0,
+
+			// Left
+			0.0, 1.0,
+			0.0, 0.0,
+			1.0, 0.0,
+
+			1.0, 1.0,
+			0.0, 1.0,
+			1.0, 0.0,
+
+			// Bottom
+			0.0, 1.0,
+			0.0, 0.0,
+			1.0, 1.0,
+
+			1.0, 0.0,
+			0.0, 0.0,
+			1.0, 1.0,
+
+			// Top
+			0.0, 1.0,
+			0.0, 0.0,
+			1.0, 1.0,
+
+			1.0, 0.0,
+			0.0, 0.0,
+			1.0, 1.0
+		];
+	}
+
+	/**
+	 * Sets the model matrix
+	 * @param {Object} position x,y,z
+	 * @param {Object} orientation x,y,z - angles in degree
+	 */
+	SetModelMatrix (position = this.position, orientation = this.orientation) {
+		
+		// Convert the orientation to RAD
+		this.position = position;
+		this.orientation = orientation;
+
+		orientation = {x: degToRad(orientation.x), y: degToRad(orientation.y), z: degToRad(orientation.z)};
+
+		// Set the transformation matrix
+		this.modelMatrix = mat4.create();
+		mat4.translate(this.modelMatrix, this.modelMatrix, [position.x, position.y, position.z]);
+		mat4.rotate(this.modelMatrix, this.modelMatrix, orientation.x, [1, 0, 0]);
+		mat4.rotate(this.modelMatrix, this.modelMatrix, orientation.y, [0, 1, 0]);
+		mat4.rotate(this.modelMatrix, this.modelMatrix, orientation.z, [0, 0, 1]);
+
+		//Set the normalmatrix 
+		let modelViewMatrix = mat4.create();
+		mat4.multiply(modelViewMatrix, viewMatrix, this.modelMatrix);
+		this.normalMatrix = mat4.create();
+		mat4.transpose(this.normalMatrix, modelViewMatrix);
+		mat4.invert(this.normalMatrix, this.normalMatrix);
+
+	}
+	/**
+	 * Sets the buffer data
+	 */
+	InitBuffer () {
+		gl.useProgram(program);
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesVBO);
+
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.mesh.concat(this.normals.concat(this.textureCoordinates))), gl.STATIC_DRAW);
+		gl.uniformMatrix4fv(modelMatrixLoc, false, new Float32Array(this.modelMatrix));		
+		gl.uniformMatrix4fv(normalMatrixLoc, false, new Float32Array(this.normalMatrix));	
+	}
+
+	/**
+	 * Updates the model matrix to the buffer
+	 */
+	UpdateBuffer () {
+		// Push the matrix to the buffer
+		gl.uniformMatrix4fv(modelMatrixLoc, false, new Float32Array(this.modelMatrix));	
+		gl.uniformMatrix4fv(normalMatrixLoc, false, new Float32Array(this.normalMatrix));
+
+		this.SetModelMatrix();
 
 		//Übergebe hier die Materialkoeffizienten des Objektes an den Shader
 		gl.uniform4f(kaLoc, this.ka[0], this.ka[1], this.ka[2], this.ka[3]);
@@ -652,10 +937,10 @@ function init() {
 
 	gl.uniformMatrix4fv(projectionMatrixLoc, false, projectionMatrix);
 	
-    gl.uniform3fv(lightPositionLoc, [-0.5, -0.5, -0.5]);
+    gl.uniform3fv(lightPositionLoc, [0.5, -0.5, -0.5]); //vorn rechts
 	gl.uniform4fv(IaLoc, [0.1, 0.1, 0.1, 1.0]);
 	gl.uniform4fv(IdLoc, [0.8, 0.8, 0.8, 1.0]);
-	gl.uniform4fv(IsLoc, [0.0, 0.0, 0.0, 1.0]);
+	gl.uniform4fv(IsLoc, [0.5, 0.5, 0.5, 1.0]);
 
 	document.addEventListener("keydown", keydown);
 	document.addEventListener("keyup", keyup);
@@ -667,15 +952,15 @@ function init() {
 	// 3. Specify vertices
 	
 	//Himmel
-	let Himmel = new Cube({x: -1.0, y: -1.0, z: -1.0},{x: 1.0, y: 1.0, z: 1.0}, {ka: [0.529, 0.808, 0.922, 1.0], kd: [0.0, 0.0, 0.0, 1.0], ks: [0.0, 0.0, 0.0, 1.0]});
+	let Himmel = new HimmelCube({x: -1.0, y: -1.0, z: -1.0},{x: 1.0, y: 1.0, z: 1.0}, {ka: [0.529, 0.808, 0.922, 1.0], kd: [0.229, 0.408, 0.472, 1.0], ks: [0.0, 0.0, 0.0, 1.0]});
 	objects.push(Himmel);
 	
 	//Ozean
-	let Ozean = new Cube({x: -1.0, y: -0.99, z: -1.0},{x: 1, y: -0.98, z: 1.0}, {ka: [0.0, 1.0, 1.0, 1.0], kd: [0.0, 0.8, 0.8, 1.0], ks: [0.0, 0.6, 0.6, 1.0]});	//rumspielen!
+	let Ozean = new Cube({x: -1.0, y: -0.99, z: -1.0},{x: 1, y: -0.98, z: 1.0}, {ka: [0.0, 1.0, 1.0, 1.0], kd: [0.0, 0.5, 0.5, 1.0], ks: [0.0, 0.6, 0.6, 1.0]});	//rumspielen!
 	objects.push(Ozean);
 
 	//Strand
-	let Strand = new Cube({x: -0.5, y: -0.98, z: -0.5},{x: 0.5, y: -0.97, z: 0.5}, {ka: [1.0, 1.0, 0.0, 1.0], kd: [0.8, 0.8, 0.0, 1.0], ks: [0.0, 0.0, 0.0, 1.0]}, isTextured = 1); //rumspielen!
+	let Strand = new Cube({x: -0.5, y: -0.98, z: -0.5},{x: 0.5, y: -0.97, z: 0.5}, {ka: [1.0, 1.0, 0.0, 1.0], kd: [0.0, 0.0, 0.0, 1.0], ks: [0.2, 0.2, 0.0, 1.0]}, isTextured = 1); //rumspielen!; kd entfällt
 	objects.push(Strand);
 	
 	//Palmenstamm
@@ -700,9 +985,9 @@ function init() {
 	let Palmenstamm7 = new Pyramidenstumpf({x: -0.04, y: -0.75, z: -0.04},{x: 0.04, y: -0.71, z: 0.04});
 	objects.push(Palmenstamm7);
 	
-	let Testii = new Pyramidenstumpf({x: -0.04, y: -0.75, z: -0.04},{x: 0.04, y: -0.71, z: 0.04});
-	Testii.SetModelMatrix({x: 0.5, y: -0.7, z: 0.4},{x: 0.0, y: 0.0, z: 0.0});
-	objects.push(Testii);
+	//let Testii = new Pyramidenstumpf({x: -0.04, y: -0.75, z: -0.04},{x: 0.04, y: -0.71, z: 0.04});
+	//Testii.SetModelMatrix({x: 0.5, y: -0.7, z: 0.4},{x: 0.0, y: 0.0, z: 0.0});
+	//objects.push(Testii);
 
 	//Palmenblätter
 	let Palmenblatt1 = new Cube({x: -0.04, y: -0.715, z: -0.2},{x: 0.04, y: -0.705, z: 0.2}, {ka: [0.0, 0.2 ,0.0, 1.0], kd: [0.0, 0.8 , 0.0, 1.0], ks: [0.0, 0.0, 0.0, 1.0]});
