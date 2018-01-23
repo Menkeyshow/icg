@@ -41,7 +41,7 @@
 				lightPos = viewMatrix * vec4(lightPosition, 1.0);
 				position = viewMatrix * modelMatrix * vPosition;
 				
-				fNormal = vec4(vNormal, 1.0); //zum Testen muss der hintere Wert verändert werden?
+				fNormal = vec4(vNormal, 0.0);
 				
 				fTexCoord = vTexCoord;
 
@@ -96,7 +96,6 @@
 				//Berechnung für untexturierte Objekte
 				gl_FragColor =  vec4((Ia * ka + f_att * (Id * kd * max(dot(N, L), 0.0) + Is * ks * pow(max(dot(R, V), 0.0), specExp))).rgb,1.0);
 
-				//Ich weiß, hier ist noch einiges doppelt gemoppelt, aber ich wollte nur schauen, ob das überaupt hinhaut.
 				if(isTextured == 1){
 
 					//Berechnung der TBN-Matrix für texturierte Objekte
@@ -141,10 +140,6 @@
                 //gl_FragColor = normalize(lightPos);//Licht Test
 				//gl_FragColor = diffuseColor;		 //Textur Test 
 				//-------------------------------------
-
-				
-				//alter Code, Christian hat gemeint, das evtl der gesetzte Alphakanal Probleme bereitet; aber das Ergebnis is dasselbe.
-				//gl_FragColor =  Ia * ka + f_att * (Id * diffuseColor * max(dot(N, L), 0.0) + Is * ks * pow(max(dot(R, V), 0.0), specExp));
 			}
 		</script>
 

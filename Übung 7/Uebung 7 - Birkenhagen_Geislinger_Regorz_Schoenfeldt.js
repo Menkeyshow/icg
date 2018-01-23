@@ -937,7 +937,7 @@ function init() {
 
 	gl.uniformMatrix4fv(projectionMatrixLoc, false, projectionMatrix);
 	
-    gl.uniform3fv(lightPositionLoc, [0.5, -0.5, -0.5]); //vorn rechts
+    gl.uniform3fv(lightPositionLoc, [0.5, 0.0, -0.5]); //vorn rechts
 	gl.uniform4fv(IaLoc, [0.1, 0.1, 0.1, 1.0]);
 	gl.uniform4fv(IdLoc, [0.8, 0.8, 0.8, 1.0]);
 	gl.uniform4fv(IsLoc, [0.5, 0.5, 0.5, 1.0]);
@@ -984,10 +984,6 @@ function init() {
 
 	let Palmenstamm7 = new Pyramidenstumpf({x: -0.04, y: -0.75, z: -0.04},{x: 0.04, y: -0.71, z: 0.04});
 	objects.push(Palmenstamm7);
-	
-	//let Testii = new Pyramidenstumpf({x: -0.04, y: -0.75, z: -0.04},{x: 0.04, y: -0.71, z: 0.04});
-	//Testii.SetModelMatrix({x: 0.5, y: -0.7, z: 0.4},{x: 0.0, y: 0.0, z: 0.0});
-	//objects.push(Testii);
 
 	//Palmenblätter
 	let Palmenblatt1 = new Cube({x: -0.04, y: -0.715, z: -0.2},{x: 0.04, y: -0.705, z: 0.2}, {ka: [0.0, 0.2 ,0.0, 1.0], kd: [0.0, 0.8 , 0.0, 1.0], ks: [0.0, 0.0, 0.0, 1.0]});
