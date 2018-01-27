@@ -1,6 +1,6 @@
 /* ICG
 **
-** Übung 6
+** Übung 8
 **
 ** Gruppe 4_5 
 ** Birkenhagen, Maximilian    - 6948018
@@ -583,147 +583,7 @@ class Cube {
 	}
 	}
 
-	class WasserCube {
-	constructor (levelOfDetail = 2, Colors = {ka: [1.0, 0.0, 1.0, 1.0], kd: [1.0, 0.0, 1.0, 1], 
-	    ks: [0.3, 0.0, 0.3, 1.0]}, isTextured = 0) {
-	        this.levelOfDetail = levelOfDetail;
-	        this.size = 10.0;
-	        this.mesh = [];
-	        this.normals = [];
-	        this.orientation = {x: 0, y: 0, z: 0};
-	        this.position = {x: 0, y: 0, z: 0};
-	        this.verticesVBO = gl.createBuffer();
-	        this.modelMatrix;
-	        this.normalMatrix;
-	        this.ka = vec4.fromValues(Colors.ka[0],Colors.ka[1],Colors.ka[2],Colors.ka[3]);
-	        this.kd = vec4.fromValues(Colors.kd[0],Colors.kd[1],Colors.kd[2],Colors.kd[3]);
-	        this.ks = vec4.fromValues(Colors.ks[0],Colors.ks[1],Colors.ks[2],Colors.ks[3]);
-	        this.specularExponent = 4.0;
-	        this.isTextured = isTextured;
-
-	        this.SetModelMatrix(this.position, this.orientation);
-	        this.MakeModel();
-	        this.InitBuffer();
-		
-	    }
-
-    /**
-	 * Makes the model, namely the mesh and the colors arrays
-	 */
-	    MakeModel () {
-            
-	        for(let i = 0; i < this.levelOfDetail; i++)
-	        {
-	            for(let j = 0; j < this.levelOfDetail; j++)
-	            {
-	                let I1 = 2 * this.size * i / this.levelOfDetail - 1;
-	                let I2 = 2 * this.size * (i + 1) / this.levelOfDetail - 1;
-
-	                let J1 = 2 * this.size * j / this.levelOfDetail - 1;
-	                let J2 = 2 * this.size * (j + 1) / this.levelOfDetail - 1;
-
-	                this.mesh = this.mesh.concat([I1, -0.99, J1]);
-	                this.mesh = this.mesh.concat([I2, -0.99, J1]);
-	                this.mesh = this.mesh.concat([I1, -0.99, J2]);
-
-	                this.mesh = this.mesh.concat([I2, -0.99, J1]);
-	                this.mesh = this.mesh.concat([I1, -0.99, J2]);
-	                this.mesh = this.mesh.concat([I2, -0.99, J2]);
-
-	            }
-
-	        }
-	    
-	        for(let i = 0; i < this.levelOfDetail*this.levelOfDetail*6; i++)
-	        {
-	            this.normals = this.normals.concat([0.0, 1.0, 0.0]);
-	        }
-
-	        console.log(this.mesh);
-	        console.log(this.normals);
-            
-
-	       // this.mesh = this.mesh.concat([-1.0, -0.99, -1.0, -1.0, -0.99, 1.0, 1.0, -0.99, 1.0]);
-	        //this.normals = this.normals.concat([0.0, 1.0, 0.0,0.0, 1.0, 0.0,0.0, 1.0, 0.0]);
-	}
-
-    /**
-	 * Sets the model matrix
-	 * @param {Object} position x,y,z
-	 * @param {Object} orientation x,y,z - angles in degree
-	 */
-	SetModelMatrix (position = this.position, orientation = this.orientation) {
-		
-	    // Convert the orientation to RAD
-	    this.position = position;
-	    this.orientation = orientation;
-
-	    orientation = {x: degToRad(orientation.x), y: degToRad(orientation.y), z: degToRad(orientation.z)};
-
-	    // Set the transformation matrix
-	    this.modelMatrix = mat4.create();
-	    mat4.translate(this.modelMatrix, this.modelMatrix, [position.x, position.y, position.z]);
-	    mat4.rotate(this.modelMatrix, this.modelMatrix, orientation.x, [1, 0, 0]);
-	    mat4.rotate(this.modelMatrix, this.modelMatrix, orientation.y, [0, 1, 0]);
-	    mat4.rotate(this.modelMatrix, this.modelMatrix, orientation.z, [0, 0, 1]);
-
-	    //Set the normalmatrix 
-	    let modelViewMatrix = mat4.create();
-	    mat4.multiply(modelViewMatrix, viewMatrix, this.modelMatrix);
-	    this.normalMatrix = mat4.create();
-	    mat4.transpose(this.normalMatrix, modelViewMatrix);
-	    mat4.invert(this.normalMatrix, this.normalMatrix);
-
-	}
-	    /**
-         * Sets the buffer data
-         */
-	    InitBuffer () {
-	        gl.useProgram(program);
-	        gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesVBO);
-
-	        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.mesh.concat(this.normals)), gl.STATIC_DRAW);
-	        gl.uniformMatrix4fv(modelMatrixLoc, false, new Float32Array(this.modelMatrix));		
-	        gl.uniformMatrix4fv(normalMatrixLoc, false, new Float32Array(this.normalMatrix));	
-	    }
-
-	    /**
-         * Updates the model matrix to the buffer
-         */
-	    UpdateBuffer () {
-	        // Push the matrix to the buffer
-	        gl.uniformMatrix4fv(modelMatrixLoc, false, new Float32Array(this.modelMatrix));	
-	        gl.uniformMatrix4fv(normalMatrixLoc, false, new Float32Array(this.normalMatrix));
-
-	        this.SetModelMatrix();
-
-	        //Übergebe hier die Materialkoeffizienten des Objektes an den Shader
-	        gl.uniform4f(kaLoc, this.ka[0], this.ka[1], this.ka[2], this.ka[3]);
-	        gl.uniform4f(ksLoc, this.ks[0], this.ks[1], this.ks[2], this.ks[3]);
-	        gl.uniform4f(kdLoc, this.kd[0], this.kd[1], this.kd[2], this.kd[3]);
-	        gl.uniform1f(specularExponentLoc, this.specularExponent);	
-	        gl.uniform1i(isTexturedLoc, this.isTextured);
-
-	    }
-
-	    Render () {
-		
-	        // Bind the program and the vertex buffer object
-	        gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesVBO);
-
-	        // Set attribute pointers and enable them
-	        gl.vertexAttribPointer(pointLoc, 3, gl.FLOAT, false, 0, 0);
-	        gl.vertexAttribPointer(normalsLoc, 3, gl.FLOAT, false, 0, this.mesh.length*4);
-	        gl.enableVertexAttribArray(pointLoc);
-	        gl.enableVertexAttribArray(normalsLoc);
-		
-	        // Set uniforms
-	        this.UpdateBuffer();
-
-	        // Draw the object
-	        gl.drawArrays(gl.TRIANGLES, 0, this.mesh.length/3);
-	    }
-	}
+	
 class HimmelCube {
 	constructor (from = {x: 0.0, y: 0.0, z: 0.0}, to = {x: 0.0, y: 0.0, z: 0.0}, 
 		Colors = {ka: [1.0, 1.0, 0.0, 1.0], kd: [1.0, 1.0, 0.0, 1], 
@@ -1001,6 +861,147 @@ class HimmelCube {
 		gl.drawArrays(gl.TRIANGLES, 0, this.mesh.length/3);
 	}
 }
+class WasserCube {
+	constructor (levelOfDetail = 2, Colors = {ka: [1.0, 0.0, 1.0, 1.0], kd: [1.0, 0.0, 1.0, 1], 
+	    ks: [0.3, 0.0, 0.3, 1.0]}, isTextured = 0) {
+	        this.levelOfDetail = levelOfDetail;
+	        this.size = 1.0;
+	        this.mesh = [];
+	        this.normals = [];
+	        this.orientation = {x: 0, y: 0, z: 0};
+	        this.position = {x: 0, y: 0, z: 0};
+	        this.verticesVBO = gl.createBuffer();
+	        this.modelMatrix;
+	        this.normalMatrix;
+	        this.ka = vec4.fromValues(Colors.ka[0],Colors.ka[1],Colors.ka[2],Colors.ka[3]);
+	        this.kd = vec4.fromValues(Colors.kd[0],Colors.kd[1],Colors.kd[2],Colors.kd[3]);
+	        this.ks = vec4.fromValues(Colors.ks[0],Colors.ks[1],Colors.ks[2],Colors.ks[3]);
+	        this.specularExponent = 4.0;
+	        this.isTextured = isTextured;
+
+	        this.SetModelMatrix(this.position, this.orientation);
+	        this.MakeModel();
+	        this.InitBuffer();
+		
+	    }
+
+    /**
+	 * Makes the model, namely the mesh and the colors arrays
+	 */
+	    MakeModel () {
+            
+	        for(let i = 0; i < this.levelOfDetail; i++)
+	        {
+	            for(let j = 0; j < this.levelOfDetail; j++)
+	            {
+	                let I1 = 2 * this.size * i / this.levelOfDetail - 1;
+	                let I2 = 2 * this.size * (i + 1) / this.levelOfDetail - 1;
+
+	                let J1 = 2 * this.size * j / this.levelOfDetail - 1;
+	                let J2 = 2 * this.size * (j + 1) / this.levelOfDetail - 1;
+
+	                this.mesh = this.mesh.concat([I1, -0.99, J1]);
+	                this.mesh = this.mesh.concat([I2, -0.99, J1]);
+	                this.mesh = this.mesh.concat([I1, -0.99, J2]);
+
+	                this.mesh = this.mesh.concat([I2, -0.99, J1]);
+	                this.mesh = this.mesh.concat([I1, -0.99, J2]);
+	                this.mesh = this.mesh.concat([I2, -0.99, J2]);
+
+	            }
+
+	        }
+	    
+	        for(let i = 0; i < this.levelOfDetail*this.levelOfDetail*6; i++)
+	        {
+	            this.normals = this.normals.concat([0.0, 1.0, 0.0]);
+	        }
+
+	        console.log(this.mesh);
+	        console.log(this.normals);
+            
+
+	       // this.mesh = this.mesh.concat([-1.0, -0.99, -1.0, -1.0, -0.99, 1.0, 1.0, -0.99, 1.0]);
+	        //this.normals = this.normals.concat([0.0, 1.0, 0.0,0.0, 1.0, 0.0,0.0, 1.0, 0.0]);
+	}
+
+    /**
+	 * Sets the model matrix
+	 * @param {Object} position x,y,z
+	 * @param {Object} orientation x,y,z - angles in degree
+	 */
+	SetModelMatrix (position = this.position, orientation = this.orientation) {
+		
+	    // Convert the orientation to RAD
+	    this.position = position;
+	    this.orientation = orientation;
+
+	    orientation = {x: degToRad(orientation.x), y: degToRad(orientation.y), z: degToRad(orientation.z)};
+
+	    // Set the transformation matrix
+	    this.modelMatrix = mat4.create();
+	    mat4.translate(this.modelMatrix, this.modelMatrix, [position.x, position.y, position.z]);
+	    mat4.rotate(this.modelMatrix, this.modelMatrix, orientation.x, [1, 0, 0]);
+	    mat4.rotate(this.modelMatrix, this.modelMatrix, orientation.y, [0, 1, 0]);
+	    mat4.rotate(this.modelMatrix, this.modelMatrix, orientation.z, [0, 0, 1]);
+
+	    //Set the normalmatrix 
+	    let modelViewMatrix = mat4.create();
+	    mat4.multiply(modelViewMatrix, viewMatrix, this.modelMatrix);
+	    this.normalMatrix = mat4.create();
+	    mat4.transpose(this.normalMatrix, modelViewMatrix);
+	    mat4.invert(this.normalMatrix, this.normalMatrix);
+
+	}
+	    /**
+         * Sets the buffer data
+         */
+	    InitBuffer () {
+	        gl.useProgram(program);
+	        gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesVBO);
+
+	        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.mesh.concat(this.normals)), gl.STATIC_DRAW);
+	        gl.uniformMatrix4fv(modelMatrixLoc, false, new Float32Array(this.modelMatrix));		
+	        gl.uniformMatrix4fv(normalMatrixLoc, false, new Float32Array(this.normalMatrix));	
+	    }
+
+	    /**
+         * Updates the model matrix to the buffer
+         */
+	    UpdateBuffer () {
+	        // Push the matrix to the buffer
+	        gl.uniformMatrix4fv(modelMatrixLoc, false, new Float32Array(this.modelMatrix));	
+	        gl.uniformMatrix4fv(normalMatrixLoc, false, new Float32Array(this.normalMatrix));
+
+	        this.SetModelMatrix();
+
+	        //Übergebe hier die Materialkoeffizienten des Objektes an den Shader
+	        gl.uniform4f(kaLoc, this.ka[0], this.ka[1], this.ka[2], this.ka[3]);
+	        gl.uniform4f(ksLoc, this.ks[0], this.ks[1], this.ks[2], this.ks[3]);
+	        gl.uniform4f(kdLoc, this.kd[0], this.kd[1], this.kd[2], this.kd[3]);
+	        gl.uniform1f(specularExponentLoc, this.specularExponent);	
+	        gl.uniform1i(isTexturedLoc, this.isTextured);
+
+	    }
+
+	    Render () {
+		
+	        // Bind the program and the vertex buffer object
+	        gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesVBO);
+
+	        // Set attribute pointers and enable them
+	        gl.vertexAttribPointer(pointLoc, 3, gl.FLOAT, false, 0, 0);
+	        gl.vertexAttribPointer(normalsLoc, 3, gl.FLOAT, false, 0, this.mesh.length*4);
+	        gl.enableVertexAttribArray(pointLoc);
+	        gl.enableVertexAttribArray(normalsLoc);
+		
+	        // Set uniforms
+	        this.UpdateBuffer();
+
+	        // Draw the object
+	        gl.drawArrays(gl.TRIANGLES, 0, this.mesh.length/3);
+	    }
+	}
 function initTextures() {
     sandTexture = gl.createTexture();
     sandImage = new Image();
@@ -1095,16 +1096,16 @@ function init() {
 	// 3. Specify vertices
 	
 	//Himmel
-   	//let Himmel = new HimmelCube({x: -1.0, y: -1.0, z: -1.0},{x: 1.0, y: 1.0, z: 1.0}, {ka: [0.529, 0.808, 0.922, 1.0], kd: [0.229, 0.408, 0.472, 1.0], ks: [0.0, 0.0, 0.0, 1.0]});
-	//objects.push(Himmel);
+   	let Himmel = new HimmelCube({x: -1.0, y: -1.0, z: -1.0},{x: 1.0, y: 1.0, z: 1.0}, {ka: [0.529, 0.808, 0.922, 1.0], kd: [0.229, 0.408, 0.472, 1.0], ks: [0.0, 0.0, 0.0, 1.0]});
+	objects.push(Himmel);
 	
 	//Ozean
 	let Ozean = new WasserCube();	//rumspielen!
 	objects.push(Ozean);
 
 	//Strand
-	//let Strand = new Cube({x: -0.5, y: -0.98, z: -0.5},{x: 0.5, y: -0.97, z: 0.5}, {ka: [1.0, 1.0, 0.0, 1.0], kd: [0.0, 0.0, 0.0, 1.0], ks: [0.2, 0.2, 0.0, 1.0]}, isTextured = 1); //rumspielen!; kd entfällt
-	//objects.push(Strand);
+	let Strand = new Cube({x: -0.5, y: -0.98, z: -0.5},{x: 0.5, y: -0.97, z: 0.5}, {ka: [1.0, 1.0, 0.0, 1.0], kd: [0.0, 0.0, 0.0, 1.0], ks: [0.2, 0.2, 0.0, 1.0]}, isTextured = 1); //rumspielen!; kd entfällt
+	objects.push(Strand);
 	
 	//Palmenstamm
 	let Palmenstamm1 = new Pyramidenstumpf({x: -0.04, y: -0.99, z: -0.04},{x: 0.04, y: -0.95, z: 0.04});
