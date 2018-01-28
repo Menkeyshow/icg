@@ -26,6 +26,8 @@
 			uniform mat4 modelMatrix;
 			uniform mat4 viewMatrix;
 			uniform mat4 projectionMatrix;
+			uniform int isWaved;
+			uniform float clock;
 
 			uniform vec3 lightPosition;
 
@@ -39,8 +41,12 @@
 			{
 				// Rechne alle übergebenen Koordinaten (Lichtposition, Normalen) in das Kamerakoordinatensystem um
 				lightPos = viewMatrix * vec4(lightPosition, 1.0);
+
 				position = viewMatrix * modelMatrix * vPosition;
-				
+
+				if(isWaved == 1){
+					position.y = position.y + (0.02 * ((sin(clock))+ 1.0 + ((position.x - position.z)*0.5)));
+				}
 				fNormal = vec4(vNormal, 0.0);
 				
 				fTexCoord = vTexCoord;

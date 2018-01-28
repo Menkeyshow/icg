@@ -37,7 +37,9 @@ let lightPositionLoc,
 	kaLoc,
 	kdLoc,
 	ksLoc,
-	isTexturedLoc;
+	isTexturedLoc,
+	isWavedLoc,
+	clockLoc;
 
 let	normalMatrixLoc,
 	normalMatrix;
@@ -45,7 +47,7 @@ let	normalMatrixLoc,
 let viewMatrixLoc,
 	viewMatrix;
 
-let clock;
+let clock = 0.0;
 
 let projectionMatrixLoc,
 	projectionMatrix;
@@ -74,7 +76,7 @@ function degToRad (deg) {
 
 class Pyramidenstumpf {
 		constructor (from = {x: -0.5, y: -0.0, z: -0.5}, to = {x: 0.5, y: 0.5, z: 0.5}, 
-			isTextured = 0) {
+			isTextured = 0, isWaved = 0) {
 			this.from = from;
 			this.to = to;
 			this.mesh;
@@ -89,6 +91,7 @@ class Pyramidenstumpf {
 			this.ks = vec4.fromValues(0.0, 0.0, 0.0, 1.0);
 			this.specularExponent = 4.0;
 			this.isTextured = isTextured;
+			this.isWaved = isWaved;
 
 			this.SetModelMatrix(this.position, this.orientation);
 			this.MakeModel();
@@ -282,6 +285,7 @@ class Pyramidenstumpf {
 			gl.uniform4f(kdLoc, this.kd[0], this.kd[1], this.kd[2], this.kd[3]);
 			gl.uniform1f(specularExponentLoc, this.specularExponent);	
 			gl.uniform1i(isTexturedLoc, this.isTextured);
+			gl.uniform1i(isWavedLoc, this.isWaved);
 			
 		}
 	
@@ -308,7 +312,7 @@ class Pyramidenstumpf {
 class Cube {
 	constructor (from = {x: 0.0, y: 0.0, z: 0.0}, to = {x: 0.0, y: 0.0, z: 0.0}, 
 		Colors = {ka: [1.0, 1.0, 0.0, 1.0], kd: [1.0, 1.0, 0.0, 1], 
-			ks: [1.0, 1.0, 0.0, 1.0]}, isTextured = 0) {
+			ks: [1.0, 1.0, 0.0, 1.0]}, isTextured = 0, isWaved = 0) {
 		this.from = from;
 		this.to = to;
 		this.mesh;
@@ -324,6 +328,7 @@ class Cube {
 		this.ks = vec4.fromValues(Colors.ks[0],Colors.ks[1],Colors.ks[2],Colors.ks[3]);
 		this.specularExponent = 4.0;
 		this.isTextured = isTextured;
+		this.isWaved = isWaved;
 
 		this.SetModelMatrix(this.position, this.orientation);
 		this.MakeModel();
@@ -559,6 +564,7 @@ class Cube {
 		gl.uniform4f(kdLoc, this.kd[0], this.kd[1], this.kd[2], this.kd[3]);
 		gl.uniform1f(specularExponentLoc, this.specularExponent);	
 		gl.uniform1i(isTexturedLoc, this.isTextured);
+		gl.uniform1i(isWavedLoc, this.isWaved);
 
 	}
 
@@ -587,7 +593,7 @@ class Cube {
 class HimmelCube {
 	constructor (from = {x: 0.0, y: 0.0, z: 0.0}, to = {x: 0.0, y: 0.0, z: 0.0}, 
 		Colors = {ka: [1.0, 1.0, 0.0, 1.0], kd: [1.0, 1.0, 0.0, 1], 
-			ks: [1.0, 1.0, 0.0, 1.0]}, isTextured = 0) {
+			ks: [1.0, 1.0, 0.0, 1.0]}, isTextured = 0, isWaved = 0) {
 		this.from = from;
 		this.to = to;
 		this.mesh;
@@ -603,6 +609,7 @@ class HimmelCube {
 		this.ks = vec4.fromValues(Colors.ks[0],Colors.ks[1],Colors.ks[2],Colors.ks[3]);
 		this.specularExponent = 4.0;
 		this.isTextured = isTextured;
+		this.isWaved = isWaved;
 
 		this.SetModelMatrix(this.position, this.orientation);
 		this.MakeModel();
@@ -838,11 +845,12 @@ class HimmelCube {
 		gl.uniform4f(kdLoc, this.kd[0], this.kd[1], this.kd[2], this.kd[3]);
 		gl.uniform1f(specularExponentLoc, this.specularExponent);	
 		gl.uniform1i(isTexturedLoc, this.isTextured);
+		gl.uniform1i(isWavedLoc, this.isWaved);
 
 	}
 
 	Render () {
-	    clock++;
+	    
 		// Bind the program and the vertex buffer object
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesVBO);
 
@@ -861,9 +869,9 @@ class HimmelCube {
 		gl.drawArrays(gl.TRIANGLES, 0, this.mesh.length/3);
 	}
 }
-class WasserCube {
+class WasserFläche {
 	constructor (levelOfDetail = 2, Colors = {ka: [1.0, 0.0, 1.0, 1.0], kd: [1.0, 0.0, 1.0, 1], 
-	    ks: [0.3, 0.0, 0.3, 1.0]}, isTextured = 0) {
+	    ks: [0.3, 0.0, 0.3, 1.0]}, isTextured = 0, isWaved = 1) {
 	        this.levelOfDetail = levelOfDetail;
 	        this.size = 1.0;
 	        this.mesh = [];
@@ -878,6 +886,7 @@ class WasserCube {
 	        this.ks = vec4.fromValues(Colors.ks[0],Colors.ks[1],Colors.ks[2],Colors.ks[3]);
 	        this.specularExponent = 4.0;
 	        this.isTextured = isTextured;
+			this.isWaved = isWaved;
 
 	        this.SetModelMatrix(this.position, this.orientation);
 	        this.MakeModel();
@@ -980,7 +989,8 @@ class WasserCube {
 	        gl.uniform4f(ksLoc, this.ks[0], this.ks[1], this.ks[2], this.ks[3]);
 	        gl.uniform4f(kdLoc, this.kd[0], this.kd[1], this.kd[2], this.kd[3]);
 	        gl.uniform1f(specularExponentLoc, this.specularExponent);	
-	        gl.uniform1i(isTexturedLoc, this.isTextured);
+			gl.uniform1i(isTexturedLoc, this.isTextured);
+			gl.uniform1i(isWavedLoc, this.isWaved);
 
 	    }
 
@@ -1048,6 +1058,8 @@ function init() {
 	modelMatrixLoc = gl.getUniformLocation(program, "modelMatrix");
 	normalMatrixLoc = gl.getUniformLocation(program, "normalMatrix");
 	isTexturedLoc = gl.getUniformLocation(program, "isTextured");
+	isWavedLoc = gl.getUniformLocation(program, "isWaved");
+	clockLoc = gl.getUniformLocation(program, "clock");
 
 	viewMatrixLoc = gl.getUniformLocation(program, "viewMatrix");
 	projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
@@ -1100,7 +1112,7 @@ function init() {
 	objects.push(Himmel);
 	
 	//Ozean
-	let Ozean = new WasserCube();	//rumspielen!
+	let Ozean = new WasserFläche();	//rumspielen!
 	objects.push(Ozean);
 
 	//Strand
@@ -1144,6 +1156,9 @@ function init() {
 function render()
 {
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+	clock = (clock + 0.01) % 360;
+	gl.uniform1f(clockLoc, clock);
 
 	// Connect diffuse map to the shader
 	gl.activeTexture(gl.TEXTURE0);
