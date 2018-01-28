@@ -870,8 +870,8 @@ class HimmelCube {
 	}
 }
 class WasserFläche {
-	constructor (levelOfDetail = 2, Colors = {ka: [1.0, 0.0, 1.0, 1.0], kd: [1.0, 0.0, 1.0, 1], 
-	    ks: [0.3, 0.0, 0.3, 1.0]}, isTextured = 0, isWaved = 1) {
+	constructor (levelOfDetail = 2, Colors = {ka: [0.0, 1.0, 1.0, 1.0], kd: [0.0, 1.0, 1.0, 1], 
+	    ks: [0.0, 0.3, 0.3, 1.0]}, isTextured = 0, isWaved = 1) {
 	        this.levelOfDetail = levelOfDetail;
 	        this.size = 1.0;
 	        this.mesh = [];
@@ -1077,8 +1077,8 @@ function init() {
 	normalMapLoc = gl.getUniformLocation(program, "normalMap");
 
 	// Set view matrix
-	eye = vec3.fromValues(0.0, -0.75, 0.48);
-	target = vec3.fromValues(0.0, -0.75, 0.0);
+	eye = vec3.fromValues(0.0, -0.65, 0.48);
+	target = vec3.fromValues(0.0, -0.65, 0.0);
 	up = vec3.fromValues(0.0, 1.0, 0.0);
 
 	viewMatrix = mat4.create();
@@ -1116,36 +1116,36 @@ function init() {
 	objects.push(Ozean);
 
 	//Strand
-	let Strand = new Cube({x: -0.5, y: -0.98, z: -0.5},{x: 0.5, y: -0.97, z: 0.5}, {ka: [1.0, 1.0, 0.0, 1.0], kd: [0.0, 0.0, 0.0, 1.0], ks: [0.2, 0.2, 0.0, 1.0]}, isTextured = 1); //rumspielen!; kd entfällt
+	let Strand = new Cube({x: -0.5, y: -0.98, z: -0.5},{x: 0.5, y: -0.87, z: 0.5}, {ka: [1.0, 1.0, 0.0, 1.0], kd: [0.0, 0.0, 0.0, 1.0], ks: [0.2, 0.2, 0.0, 1.0]}, isTextured = 1); //rumspielen!; kd entfällt
 	objects.push(Strand);
 	
 	//Palmenstamm
-	let Palmenstamm1 = new Pyramidenstumpf({x: -0.04, y: -0.99, z: -0.04},{x: 0.04, y: -0.95, z: 0.04});
+	let Palmenstamm1 = new Pyramidenstumpf({x: -0.04, y: -0.89, z: -0.04},{x: 0.04, y: -0.85, z: 0.04});
 	objects.push(Palmenstamm1);
 	
-	let Palmenstamm2 = new Pyramidenstumpf({x: -0.04, y: -0.95, z: -0.04},{x: 0.04, y: -0.91, z: 0.04});
+	let Palmenstamm2 = new Pyramidenstumpf({x: -0.04, y: -0.85, z: -0.04},{x: 0.04, y: -0.81, z: 0.04});
 	objects.push(Palmenstamm2);
 
-	let Palmenstamm3 = new Pyramidenstumpf({x: -0.04, y: -0.91, z: -0.04},{x: 0.04, y: -0.87, z: 0.04});
+	let Palmenstamm3 = new Pyramidenstumpf({x: -0.04, y: -0.81, z: -0.04},{x: 0.04, y: -0.77, z: 0.04});
 	objects.push(Palmenstamm3);
 
-	let Palmenstamm4 = new Pyramidenstumpf({x: -0.04, y: -0.87, z: -0.04},{x: 0.04, y: -0.83, z: 0.04});
+	let Palmenstamm4 = new Pyramidenstumpf({x: -0.04, y: -0.77, z: -0.04},{x: 0.04, y: -0.73, z: 0.04});
 	objects.push(Palmenstamm4);
 
-	let Palmenstamm5 = new Pyramidenstumpf({x: -0.04, y: -0.83, z: -0.04},{x: 0.04, y: -0.79, z: 0.04});
+	let Palmenstamm5 = new Pyramidenstumpf({x: -0.04, y: -0.73, z: -0.04},{x: 0.04, y: -0.69, z: 0.04});
 	objects.push(Palmenstamm5);
 
-	let Palmenstamm6 = new Pyramidenstumpf({x: -0.04, y: -0.79, z: -0.04},{x: 0.04, y: -0.75, z: 0.04});
+	let Palmenstamm6 = new Pyramidenstumpf({x: -0.04, y: -0.69, z: -0.04},{x: 0.04, y: -0.65, z: 0.04});
 	objects.push(Palmenstamm6);
 
-	let Palmenstamm7 = new Pyramidenstumpf({x: -0.04, y: -0.75, z: -0.04},{x: 0.04, y: -0.71, z: 0.04});
+	let Palmenstamm7 = new Pyramidenstumpf({x: -0.04, y: -0.65, z: -0.04},{x: 0.04, y: -0.61, z: 0.04});
 	objects.push(Palmenstamm7);
 
 	//Palmenblätter
-	let Palmenblatt1 = new Cube({x: -0.04, y: -0.715, z: -0.2},{x: 0.04, y: -0.705, z: 0.2}, {ka: [0.0, 0.2 ,0.0, 1.0], kd: [0.0, 0.8 , 0.0, 1.0], ks: [0.0, 0.0, 0.0, 1.0]});
+	let Palmenblatt1 = new Cube({x: -0.04, y: -0.615, z: -0.2},{x: 0.04, y: -0.605, z: 0.2}, {ka: [0.0, 0.2 ,0.0, 1.0], kd: [0.0, 0.8 , 0.0, 1.0], ks: [0.0, 0.0, 0.0, 1.0]});
 	objects.push(Palmenblatt1);
 
-	let Palmenblatt2 = new Cube(from = {x: -0.2, y: -0.715, z: -0.04}, to = {x: 0.2, y: -0.705, z: 0.04}, {ka: [0.0, 0.2 ,0.0, 1.0], kd: [0.0, 0.8 ,0.0, 1.0], ks: [0.0, 0.0, 0.0, 1.0]});
+	let Palmenblatt2 = new Cube(from = {x: -0.2, y: -0.615, z: -0.04}, to = {x: 0.2, y: -0.605, z: 0.04}, {ka: [0.0, 0.2 ,0.0, 1.0], kd: [0.0, 0.8 ,0.0, 1.0], ks: [0.0, 0.0, 0.0, 1.0]});
 	objects.push(Palmenblatt2);
 
 	// 8. Render
