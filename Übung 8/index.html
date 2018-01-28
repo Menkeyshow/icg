@@ -45,7 +45,11 @@
 				position = viewMatrix * modelMatrix * vPosition;
 
 				if(isWaved == 1){
+					//position.y = position.y + (sin(vPosition.x + clock) 
+					//				+ sin(vPosition.z + clock) * 0.5) * 0.15;
+
 					position.y = position.y + (0.02 * ((sin(clock + position.x + position.z))+ 1.0));
+
 				}
 				fNormal = vec4(vNormal, 0.0);
 				
