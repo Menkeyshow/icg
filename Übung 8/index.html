@@ -35,6 +35,9 @@
 			varying vec4 lightPos;
 			varying vec4 fNormal;
 
+			varying float fisWaved;
+			varying float fclock;
+
 			varying vec2 fTexCoord;
 
 			void main()
@@ -44,6 +47,7 @@
 
 				position = viewMatrix * modelMatrix * vPosition;
 
+				//Anheben und absenken der y-Positon des Wassers anhand einer Wellenfunktion
 				if(isWaved == 1){
 					//position.y = position.y + 0.2 + (sin(vPosition.x + clock) 
 					//				+ sin(vPosition.z + clock) * 0.5) * 0.15;
@@ -51,9 +55,13 @@
 					position.y = position.y + (0.06 * ((sin(clock + position.x + position.z)) + 1.0));
 
 				}
+
 				fNormal = vec4(vNormal, 0.0);
 				
+				//Übergabe einiger Variablen an den FragShader
 				fTexCoord = vTexCoord;
+				fisWaved = float(isWaved);
+				fclock = clock;
 
 				gl_Position = projectionMatrix * position;
 			}
@@ -70,6 +78,7 @@
 			uniform float specExp;
 			uniform int isTextured;
 
+
 			uniform mat4 normalMatrix;
 
 			uniform sampler2D diffuseMap;
@@ -85,6 +94,8 @@
 			varying vec4 lightPos;
 			varying vec4 fNormal;
 
+			varying float fisWaved;
+			varying float fclock;
 			varying vec2 fTexCoord;
 
 			vec3 tangent;
@@ -105,7 +116,7 @@
 		   
 				//Berechnung für untexturierte Objekte
 				gl_FragColor =  vec4((Ia * ka + f_att * (Id * kd * max(dot(N, L), 0.0) + Is * ks * pow(max(dot(R, V), 0.0), specExp))).rgb,1.0);
-
+				
 				if(isTextured == 1){
 
 					//Berechnung der TBN-Matrix für texturierte Objekte
@@ -142,6 +153,21 @@
 					gl_FragColor =  vec4((Ia * ka + f_att * (Id * diffuseColor * max(dot(N, L), 0.0) + Is * ks * pow(max(dot(R, V), 0.0), specExp))).rgb,1.0);
 
 				}
+
+				
+				if(fisWaved == 1.0){
+					//Normalen und Farbenberechnung des Wassers
+					vec3 T = normalize(vec3(position.x + 0.01, position.y, position.z) - vec3(position.x, position.y, position.z));
+					vec3 B = normalize(vec3(position.x, position.y, position.z + 0.01) - vec3(position.x, position.y, position.z));
+
+					vec3 N = cross(T,B);
+					N.y = abs(N.y);
+					vec3 R = normalize(reflect(-L, N)); 
+
+					gl_FragColor =  vec4((Ia * ka + f_att * (Id * kd * max(dot(N, L), 0.0) + Is * ks * pow(max(dot(R, V), 0.0), specExp))).rgb,1.0);
+
+				}
+				
 
 				//-------------------------------------
 				//Testen ob gewisse Funktionen funktionieren! 
