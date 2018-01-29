@@ -1081,6 +1081,7 @@ function init() {
 	target = vec3.fromValues(0.0, -0.65, 0.0);
 	up = vec3.fromValues(0.0, 1.0, 0.0);
 
+	//Debugging ~
 	/*
 	eye = vec3.fromValues(0.0, -0.0, 0.00);
 	target = vec3.fromValues(0.0, -0.1, 0.0);

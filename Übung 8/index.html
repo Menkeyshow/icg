@@ -56,7 +56,7 @@
 
 				}
 
-				fNormal = vec4(vNormal, 0.0);
+				fNormal = vec4(vNormal, 1.0); //edit back! TODO
 				
 				//Übergabe einiger Variablen an den FragShader
 				fTexCoord = vTexCoord;
@@ -99,6 +99,13 @@
 			varying vec2 fTexCoord;
 
 			vec3 tangent;
+			vec3 N;
+			vec3 L;
+			vec3 V;
+			vec3 R;
+
+			float d;
+			float f_att;
 
 			void main()
 			{	
@@ -117,6 +124,7 @@
 				//Berechnung für untexturierte Objekte
 				gl_FragColor =  vec4((Ia * ka + f_att * (Id * kd * max(dot(N, L), 0.0) + Is * ks * pow(max(dot(R, V), 0.0), specExp))).rgb,1.0);
 				
+				//Berechung der Beleuchtung für texturierte Objekte
 				if(isTextured == 1){
 
 					//Berechnung der TBN-Matrix für texturierte Objekte
@@ -135,16 +143,16 @@
 
 					//Umrechnen der Normalmap in Normalen für texturierte Objekte
 					vec3 normalMapf = texture2D(normalMap, fTexCoord).xyz * 2.0 - 1.0;
-					vec3 N = normalize(tbn * normalMapf);
+					N = normalize(tbn * normalMapf);
 
 					// Berechne und normiere die Vektoren L, R und V. 
-					vec3 L = normalize((lightPos - position).xyz);
-					vec3 V = normalize((-position).xyz);	
-					vec3 R = reflect(-L, N); 	
+					L = normalize((lightPos - position).xyz);
+					V = normalize((-position).xyz);	
+					R = reflect(-L, N); 	
 
 					// Berechne die Koeffizienten d, sowie f_{att}
-					float d = distance(lightPos, position);
-					float f_att = min(1.0/(c_1 + c_2 * d + c_3 * d * d),1.0);
+					d = distance(lightPos, position);
+					f_att = min(1.0/(c_1 + c_2 * d + c_3 * d * d),1.0);
 
 					//Festlegen des diffusen Anteils mit Hilfe der Textur bei texturierten Objekten
 					vec4 diffuseColor = texture2D(diffuseMap, fTexCoord);
@@ -154,23 +162,30 @@
 
 				}
 
+				//Berechnung der Beleuchtung anhand der neuen y-Position für Wasser
 				
 				if(fisWaved == 1.0){
 					//Normalen und Farbenberechnung des Wassers
 					vec3 T = normalize(vec3(position.x + 0.01, position.y, position.z) - vec3(position.x, position.y, position.z));
 					vec3 B = normalize(vec3(position.x, position.y, position.z + 0.01) - vec3(position.x, position.y, position.z));
 
-					vec3 N = cross(T,B);
+					N = normalize(cross(T,B));
 					N.y = abs(N.y);
-					vec3 R = normalize(reflect(-L, N)); 
+					
+					//Berechne und normiere die Vektoren L, R und V. 
+					vec3 L = normalize((lightPos - position).xyz);
+					vec3 V = normalize((-position).xyz);	
+					vec3 R = reflect(-L, N); 				
+
+					//Berechne die Koeffizienten d, sowie f_{att}
+					float d = distance(lightPos, position);
+					float f_att = min(1.0/(c_1 + c_2 * d + c_3 * d * d),1.0);
 
 					gl_FragColor =  vec4((Ia * ka + f_att * (Id * kd * max(dot(N, L), 0.0) + Is * ks * pow(max(dot(R, V), 0.0), specExp))).rgb,1.0);
 
 				}
-				
-
 				//-------------------------------------
-				//Testen ob gewisse Funktionen funktionieren! 
+				//Debugging ~
 				//Dafür aber auch fNormal = vec4(vNormal, 1.0); im VertexShader setzen
 				//gl_FragColor = normalize(fNormal); //Normalen Test
                 //gl_FragColor = normalize(lightPos);//Licht Test
@@ -190,7 +205,7 @@
 			If you see this, your browser doesn't support WebGL.
 		</canvas>
 
-		<script type="text/javascript" src="Uebung 7 - Birkenhagen_Geislinger_Regorz_Schoenfeldt.js">
+		<script type="text/javascript" src="Uebung 8 - Birkenhagen_Geislinger_Regorz_Schoenfeldt.js">
 		</script>
 		
 	</body>
